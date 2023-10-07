@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>كلامي · Kalami v2.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:         #05080f;
+  --surface:    #0b1120;
+  --surface2:   #0f1a2e;
+  --border:     #162338;
+  --border2:    #1e3050;
+  --amber:      #e8a020;
+  --amber-glow: #f5b83d;
+  --amber-dim:  #7a4e08;
+  --teal:       #1fc8a8;
+  --teal-dim:   #0a4a3c;
+  --fr:         #3a8ef5;
+  --fr-dim:     #0d2a5a;
+  --text:       #d8e4f0;
+  --text2:      #8aa0bc;
+  --muted:      #3a5070;
+  --danger:     #e05050;
+  --success:    #4caf50;
+  --star:       #f5c842;
+  --radius:     12px;
+  --radius-lg:  20px;
+  --font-scale: 1;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  font-size:calc(1rem * var(--font-scale));
+}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(232,160,32,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 100%,rgba(31,200,168,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 10% 60%,rgba(58,142,245,.04) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+body>*{position:relative;z-index:1;}
+
+/* HEADER */
+header{
+  text-align:center;
+  padding:2rem 2rem 1.2rem;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(11,17,32,.97) 0%,transparent 100%);
+  position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(14px);
+}
+
+.bismillah{
+  font-family:'Amiri',serif;
+  font-size:clamp(1.4rem,3.5vw,2.4rem);
+  color:var(--amber-glow);
+  letter-spacing:.04em;line-height:1.6;
+  text-shadow:0 0 40px rgba(245,184,61,.4),0 2px 8px rgba(0,0,0,.8);
+  margin-bottom:.5rem;
+  animation:fadeDown .8s ease both;
+}
+
+.app-title{
+  display:flex;align-items:center;justify-content:center;
+  gap:.75rem;flex-wrap:wrap;
+  animation:fadeDown .9s ease both;
+}
+.app-name-ar{font-family:'Amiri',serif;font-size:1.6rem;color:var(--amber);font-weight:700;}
+.app-name-dot{color:var(--muted);font-size:.9rem;}
+.app-name-en{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;color:var(--text2);letter-spacing:.2em;text-transform:uppercase;}
+
+/* MAIN */
+main{max-width:1160px;margin:0 auto;padding:1.5rem 1.25rem 4rem;display:flex;flex-direction:column;gap:1.25rem;}
+
+/* CONTROLS BAR */
+.controls-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:.75rem;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:.9rem 1.25rem;
+  animation:fadeUp .6s ease both .2s;
+}
+
+.controls-left{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.controls-right{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+
+/* Mode toggle */
+.mode-toggle{
+  display:flex;align-items:center;gap:.6rem;
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:50px;padding:.3rem .5rem .3rem .9rem;
+}
+.mode-label{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);}
+
+.toggle-switch{position:relative;width:48px;height:26px;cursor:pointer;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:50px;transition:background .3s;}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--text2);border-radius:50%;transition:transform .3s,background .3s;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+.toggle-switch input:checked~.toggle-track{background:var(--amber-dim);}
+.toggle-switch input:checked~.toggle-track .toggle-thumb{transform:translateX(22px);background:var(--amber);}
+
+.mode-badge{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.18rem .55rem;border-radius:20px;border:1px solid var(--border2);color:var(--text2);min-width:68px;text-align:center;transition:all .3s;}
+.mode-badge.continuous{border-color:var(--amber-dim);color:var(--amber);background:rgba(232,160,32,.08);}
+
+/* Dialect selector */
+.dialect-select{
+  background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  color:var(--text2);font-family:'DM Mono',monospace;font-size:.7rem;
+  padding:.3rem .5rem;cursor:pointer;outline:none;transition:border-color .2s;
+}
+.dialect-select:hover{border-color:var(--amber);}
+.dialect-select option{background:var(--surface2);}
+
+/* Auto-play */
+.autoplay-toggle{
+  display:flex;align-items:center;gap:.45rem;cursor:pointer;
+  padding:.35rem .75rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);font-size:.7rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;transition:all .2s;user-select:none;
+}
+.autoplay-toggle:hover{border-color:var(--teal);color:var(--teal);}
+.autoplay-toggle.active{border-color:var(--teal);color:var(--teal);background:rgba(31,200,168,.08);}
+.autoplay-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .2s;}
+.autoplay-toggle.active .autoplay-dot{background:var(--teal);}
+
+/* Back-translation toggle */
+.backtrans-toggle{
+  display:flex;align-items:center;gap:.45rem;cursor:pointer;
+  padding:.35rem .75rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);font-size:.7rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;transition:all .2s;user-select:none;
+}
+.backtrans-toggle:hover{border-color:var(--fr);color:var(--fr);}
+.backtrans-toggle.active{border-color:var(--fr);color:var(--fr);background:rgba(58,142,245,.08);}
+
+/* Near-live toggle */
+.nearlive-toggle{
+  display:flex;align-items:center;gap:.45rem;cursor:pointer;
+  padding:.35rem .75rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);font-size:.7rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;transition:all .2s;user-select:none;
+}
+.nearlive-toggle:hover{border-color:var(--amber-glow);color:var(--amber-glow);}
+.nearlive-toggle.active{border-color:var(--amber-glow);color:var(--amber-glow);background:rgba(245,184,61,.1);box-shadow:0 0 12px rgba(245,184,61,.15);}
+.nearlive-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .2s;}
+.nearlive-toggle.active .nearlive-dot{background:var(--amber-glow);animation:blink .9s ease infinite;}
+
+/* Speak language selector */
+.speak-lang-wrap{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.3rem .6rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);transition:all .3s;
+}
+.speak-lang-label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.speak-lang-btn{
+  padding:.2rem .55rem;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;color:var(--text2);font-size:.68rem;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.06em;
+}
+.speak-lang-btn:hover{border-color:var(--amber);color:var(--amber);}
+.speak-lang-btn.active{border-color:var(--amber);color:var(--amber);background:rgba(232,160,32,.12);}
+
+/* Live chunk indicator */
+.live-chunk-badge{
+  display:none;align-items:center;gap:.35rem;
+  font-size:.65rem;font-family:'DM Mono',monospace;font-weight:500;
+  color:var(--amber-glow);
+  padding:.18rem .55rem;border-radius:20px;
+  border:1px solid rgba(245,184,61,.3);background:rgba(245,184,61,.07);
+}
+.live-chunk-badge.show{display:flex;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-glow);animation:blink .7s ease infinite;}
+
+/* Btn sm */
+.btn-sm{
+  display:flex;align-items:center;gap:.35rem;
+  padding:.35rem .8rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);
+  font-family:'Syne',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.btn-sm:hover{border-color:var(--amber);color:var(--amber);}
+.btn-sm.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* Font size */
+.font-ctrl{display:flex;align-items:center;gap:.5rem;}
+.font-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.font-slider{-webkit-appearance:none;width:70px;height:4px;border-radius:4px;background:var(--border2);outline:none;cursor:pointer;}
+.font-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--amber);cursor:pointer;}
+
+/* Keyboard shortcut hint */
+.shortcut-hint{
+  font-size:.62rem;font-family:'DM Mono',monospace;color:var(--muted);
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:4px;padding:.15rem .35rem;
+}
+
+/* INPUT PANEL */
+.input-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.75rem;
+  display:flex;flex-direction:column;align-items:center;gap:1.25rem;
+  animation:fadeUp .6s ease both .3s;
+}
+.panel-label{font-size:.67rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);align-self:flex-start;}
+
+/* Dialect + mic row */
+.input-top-row{display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:.75rem;}
+
+.mic-btn{
+  position:relative;width:84px;height:84px;border-radius:50%;
+  border:2px solid var(--border2);background:var(--surface2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;transition:all .3s;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+}
+.mic-btn:hover{border-color:var(--amber);box-shadow:0 0 30px rgba(232,160,32,.2);transform:scale(1.05);}
+.mic-btn.listening{border-color:var(--amber);background:rgba(232,160,32,.1);animation:micPulse 1.5s ease infinite;}
+.mic-btn.processing{border-color:var(--teal);background:rgba(31,200,168,.08);cursor:default;}
+.mic-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+@keyframes micPulse{
+  0%{box-shadow:0 0 0 0 rgba(232,160,32,.5);}
+  70%{box-shadow:0 0 0 16px rgba(232,160,32,0);}
+  100%{box-shadow:0 0 0 0 rgba(232,160,32,0);}
+}
+
+.mic-wrapper{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.mic-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);text-align:center;transition:color .2s;}
+
+/* Waveform */
+.waveform{display:flex;align-items:center;gap:3px;height:38px;opacity:0;transition:opacity .3s;}
+.waveform.active{opacity:1;}
+.wave-bar{width:4px;border-radius:4px;background:var(--amber);height:6px;}
+.waveform.active .wave-bar{animation:waveAnim .8s ease-in-out infinite alternate;}
+.wave-bar:nth-child(1){animation-delay:.00s;}.wave-bar:nth-child(2){animation-delay:.07s;}
+.wave-bar:nth-child(3){animation-delay:.14s;}.wave-bar:nth-child(4){animation-delay:.21s;}
+.wave-bar:nth-child(5){animation-delay:.28s;}.wave-bar:nth-child(6){animation-delay:.35s;}
+.wave-bar:nth-child(7){animation-delay:.28s;}.wave-bar:nth-child(8){animation-delay:.21s;}
+.wave-bar:nth-child(9){animation-delay:.14s;}.wave-bar:nth-child(10){animation-delay:.07s;}
+.wave-bar:nth-child(11){animation-delay:.00s;}
+@keyframes waveAnim{from{height:4px;}to{height:34px;}}
+
+/* Transcript */
+.transcript-wrap{width:100%;position:relative;}
+
+.transcript-box{
+  width:100%;min-height:75px;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:.9rem 1.1rem;
+  font-family:'Amiri',serif;font-size:calc(1.2rem * var(--font-scale));
+  color:var(--text);direction:rtl;text-align:right;line-height:1.8;
+  transition:border-color .2s;outline:none;
+  white-space:pre-wrap;word-break:break-word;
+}
+.transcript-box[contenteditable="true"]:focus{border-color:var(--amber);}
+.transcript-box.has-text{border-color:var(--border2);}
+.placeholder-hint{position:absolute;top:.9rem;right:1.1rem;color:var(--muted);font-family:'Amiri',serif;font-size:1rem;font-style:italic;pointer-events:none;transition:opacity .2s;}
+
+.transcript-actions{display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:.5rem;}
+
+.translate-btn{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem 1.25rem;border-radius:10px;
+  border:1px solid var(--amber-dim);background:rgba(232,160,32,.1);
+  color:var(--amber);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.translate-btn:hover{background:rgba(232,160,32,.2);border-color:var(--amber);}
+
+.keyboard-btn{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.4rem .85rem;border-radius:8px;
+  border:1px solid var(--border2);background:var(--bg);
+  color:var(--text2);font-family:'Syne',sans-serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.keyboard-btn:hover,.keyboard-btn.active{border-color:var(--amber);color:var(--amber);}
+
+/* Memory badge */
+.memory-badge{
+  font-size:.65rem;font-family:'DM Mono',monospace;
+  color:var(--teal);background:rgba(31,200,168,.1);
+  border:1px solid var(--teal-dim);border-radius:20px;
+  padding:.15rem .55rem;display:none;
+}
+.memory-badge.show{display:inline;}
+
+/* Status */
+.status-bar{display:flex;align-items:center;gap:.5rem;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s;}
+.status-bar.listening .status-dot{background:var(--amber);animation:blink 1s ease infinite;}
+.status-bar.processing .status-dot{background:var(--teal);animation:blink .6s ease infinite;}
+.status-bar.ready .status-dot{background:var(--success);}
+.status-bar.error .status-dot{background:var(--danger);}
+.status-bar.listening{color:var(--amber);}
+.status-bar.processing{color:var(--teal);}
+.status-bar.error{color:var(--danger);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+/* ARABIC KEYBOARD */
+.arabic-keyboard{
+  width:100%;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:var(--radius);
+  padding:1rem;display:none;flex-direction:column;gap:.6rem;
+  animation:fadeUp .3s ease;
+}
+.arabic-keyboard.visible{display:flex;}
+
+.kb-row{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;}
+
+.kb-key{
+  min-width:38px;height:40px;padding:0 .5rem;
+  border-radius:7px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text);
+  font-family:'Amiri',serif;font-size:1.1rem;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.kb-key:hover{border-color:var(--amber);color:var(--amber);background:rgba(232,160,32,.08);}
+.kb-key:active{transform:scale(.92);}
+
+.kb-key.special{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  background:var(--surface);color:var(--text2);
+  min-width:54px;letter-spacing:.06em;
+}
+.kb-key.special:hover{border-color:var(--amber);color:var(--amber);}
+.kb-key.space-key{min-width:140px;}
+.kb-key.translate-key{
+  background:rgba(232,160,32,.12);border-color:var(--amber-dim);
+  color:var(--amber);font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
+  letter-spacing:.08em;min-width:90px;
+}
+
+.kb-row-actions{display:flex;gap:.5rem;justify-content:center;margin-top:.2rem;}
+
+/* OUTPUT GRID */
+.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;animation:fadeUp .6s ease both .4s;}
+@media(max-width:700px){.output-grid{grid-template-columns:1fr;}}
+
+.lang-panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.35rem;
+  display:flex;flex-direction:column;gap:.9rem;
+  transition:border-color .3s;
+}
+.lang-panel.fr{border-top:3px solid var(--fr);}
+.lang-panel.en{border-top:3px solid var(--teal);}
+.lang-panel.fullscreen-mode{
+  position:fixed;inset:0;z-index:500;border-radius:0;
+  padding:2.5rem;border-top-width:4px;overflow-y:auto;
+}
+
+.lang-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+.lang-title{display:flex;align-items:center;gap:.45rem;}
+.lang-flag{font-size:1.1rem;}
+.lang-name{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.lang-panel.fr .lang-name{color:var(--fr);}
+.lang-panel.en .lang-name{color:var(--teal);}
+
+.lang-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+
+.voice-select{
+  background:var(--bg);border:1px solid var(--border2);border-radius:6px;
+  color:var(--text2);font-family:'DM Mono',monospace;font-size:.65rem;
+  padding:.22rem .38rem;max-width:120px;cursor:pointer;outline:none;transition:border-color .2s;
+}
+.voice-select:hover{border-color:var(--amber);}
+.voice-select option{background:var(--surface2);}
+
+/* Rate slider */
+.rate-wrap{display:flex;align-items:center;gap:.4rem;}
+.rate-label{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--muted);white-space:nowrap;}
+.rate-slider{-webkit-appearance:none;width:60px;height:3px;border-radius:3px;background:var(--border2);outline:none;cursor:pointer;}
+.rate-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--amber);cursor:pointer;}
+
+/* Icon buttons */
+.icon-btn{
+  width:30px;height:30px;border-radius:7px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;
+  transition:all .2s;
+}
+.icon-btn:hover{border-color:var(--amber);color:var(--amber);}
+.icon-btn.playing{border-color:var(--amber);color:var(--amber);background:rgba(232,160,32,.1);}
+.icon-btn.copied{border-color:var(--success);color:var(--success);}
+
+/* Search */
+.search-wrap{position:relative;}
+.search-input{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;
+  padding:.35rem .75rem .35rem 1.8rem;width:100%;outline:none;transition:border-color .2s;
+}
+.search-input:focus{border-color:var(--border2);}
+.search-input::placeholder{color:var(--muted);}
+.search-icon{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);font-size:.8rem;color:var(--muted);}
+
+/* Translation history */
+.translation-history{
+  display:flex;flex-direction:column;gap:.65rem;
+  min-height:110px;max-height:320px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+}
+.translation-history::-webkit-scrollbar{width:3px;}
+.translation-history::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+.translation-entry{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:.8rem .9rem;font-size:calc(1rem * var(--font-scale));
+  line-height:1.65;color:var(--text);animation:slideIn .35s ease both;
+  position:relative;cursor:default;transition:border-color .2s;
+}
+.translation-entry.newest{border-color:var(--border2);}
+.translation-entry.starred{border-color:var(--star);background:rgba(245,200,66,.04);}
+
+.entry-actions{
+  display:flex;align-items:center;gap:.35rem;
+  margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);
+}
+
+.entry-star{
+  font-size:.8rem;cursor:pointer;opacity:.4;transition:opacity .2s,transform .2s;
+}
+.entry-star:hover,.translation-entry.starred .entry-star{opacity:1;}
+.translation-entry.starred .entry-star{color:var(--star);}
+
+.backtrans-text{
+  font-size:.75rem;font-family:'Amiri',serif;direction:rtl;
+  color:var(--text2);margin-top:.4rem;padding:.4rem .6rem;
+  background:rgba(58,142,245,.05);border-radius:6px;
+  border-left:2px solid var(--fr);display:none;
+}
+.backtrans-text.show{display:block;}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;min-height:110px;color:var(--muted);font-size:.75rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;gap:.4rem;font-family:'DM Mono',monospace;
+}
+.empty-icon{font-size:1.6rem;opacity:.3;}
+
+.replay-btn{
+  display:flex;align-items:center;gap:.35rem;
+  padding:.35rem .8rem;border-radius:8px;border:1px solid var(--border2);
+  background:var(--bg);color:var(--text2);font-family:'Syne',sans-serif;
+  font-size:.67rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;align-self:flex-start;
+}
+.replay-btn:hover{border-color:var(--amber);color:var(--amber);}
+.replay-btn:disabled{opacity:.35;cursor:default;}
+.replay-btn:disabled:hover{border-color:var(--border2);color:var(--text2);}
+
+/* FULLSCREEN OVERLAY */
+.fullscreen-close{
+  position:fixed;top:1.5rem;right:1.5rem;z-index:600;
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);
+  background:var(--surface2);color:var(--text2);font-size:1.1rem;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.fullscreen-close.visible{display:flex;}
+.fullscreen-close:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ANIMATIONS */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:2rem;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:50px;padding:.55rem 1.3rem;font-size:.78rem;font-weight:600;
+  color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);
+  transition:transform .3s ease;z-index:1000;pointer-events:none;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* SHORTCUTS PANEL */
+.shortcuts-panel{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:.8rem 1rem;display:none;flex-wrap:wrap;gap:.5rem 1.5rem;
+}
+.shortcuts-panel.visible{display:flex;}
+.sc-item{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--text2);}
+.sc-key{background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:.1rem .4rem;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--amber);}
+
+footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:.65rem;letter-spacing:.1em;font-family:'DM Mono',monospace;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <div class="app-title">
+    <span class="app-name-ar">كلامي</span>
+    <span class="app-name-dot">·</span>
+    <span class="app-name-en">Kalami v2.1 — My Speech</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Controls Bar -->
+  <div class="controls-bar">
+    <div class="controls-left">
+      <!-- Mode -->
+      <div class="mode-toggle">
+        <span class="mode-label">Mode</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="modeToggle"/>
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+      <div class="mode-badge" id="modeBadge">Manual</div>
+
+      <!-- Dialect -->
+      <select class="dialect-select" id="dialectSelect" title="Arabic dialect">
+        <option value="ar-SA">🇸🇦 MSA / Gulf</option>
+        <option value="ar-EG">🇪🇬 Egyptian</option>
+        <option value="ar-MA">🇲🇦 Maghrebi</option>
+        <option value="ar-SY">🇸🇾 Levantine</option>
+        <option value="ar-IQ">🇮🇶 Iraqi</option>
+      </select>
+
+      <!-- Auto-play -->
+      <div class="autoplay-toggle" id="autoPlayBtn">
+        <div class="autoplay-dot"></div>Auto-play
+      </div>
+
+      <!-- Back-translation -->
+      <div class="backtrans-toggle" id="backTransBtn">↩ Verify</div>
+
+      <!-- Near-live toggle -->
+      <div class="nearlive-toggle" id="nearLiveBtn">
+        <div class="nearlive-dot"></div>⚡ Near-Live
+      </div>
+
+      <!-- Speak language selector -->
+      <div class="speak-lang-wrap" id="speakLangWrap">
+        <span class="speak-lang-label">🔊 Speak</span>
+        <button class="speak-lang-btn active" data-lang="fr">🇫🇷 FR</button>
+        <button class="speak-lang-btn" data-lang="en">🇬🇧 EN</button>
+        <button class="speak-lang-btn" data-lang="both">Both</button>
+      </div>
+
+      <!-- Font -->
+      <div class="font-ctrl">
+        <span class="font-label">Aa</span>
+        <input type="range" class="font-slider" id="fontSlider" min="0.8" max="1.6" step="0.1" value="1"/>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <button class="btn-sm" id="shortcutsBtn" title="Show keyboard shortcuts">⌨️</button>
+      <button class="btn-sm" id="exportTxtBtn">📄 TXT</button>
+      <button class="btn-sm" id="exportPdfBtn">📑 PDF</button>
+      <button class="btn-sm danger" id="clearBtn">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <!-- Shortcuts Panel -->
+  <div class="shortcuts-panel" id="shortcutsPanel">
+    <div class="sc-item"><span class="sc-key">Space</span> Start/Stop mic</div>
+    <div class="sc-item"><span class="sc-key">T</span> Translate</div>
+    <div class="sc-item"><span class="sc-key">C</span> Clear history</div>
+    <div class="sc-item"><span class="sc-key">E</span> Export TXT</div>
+    <div class="sc-item"><span class="sc-key">K</span> Toggle keyboard</div>
+    <div class="sc-item"><span class="sc-key">F</span> Fullscreen FR</div>
+    <div class="sc-item"><span class="sc-key">G</span> Fullscreen EN</div>
+    <div class="sc-item"><span class="sc-key">Esc</span> Close fullscreen</div>
+  </div>
+
+  <!-- Input Panel -->
+  <div class="input-panel">
+    <div class="panel-label">Arabic Input · الإدخال العربي</div>
+
+    <div class="input-top-row">
+      <div class="mic-wrapper">
+        <button class="mic-btn" id="micBtn">
+          <span class="mic-icon">🎙️</span>
+        </button>
+        <div class="mic-label" id="micLabel">Click to speak</div>
+      </div>
+
+      <div class="waveform" id="waveform">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <div class="status-bar" id="statusBar">
+        <div class="status-dot"></div>
+        <span id="statusText">Ready</span>
+        <span class="memory-badge" id="memoryBadge">⚡ From memory</span>
+        <span class="live-chunk-badge" id="liveChunkBadge"><span class="live-dot"></span>Live</span>
+      </div>
+    </div>
+
+    <!-- Transcript -->
+    <div class="transcript-wrap">
+      <div class="transcript-box" id="transcriptBox" contenteditable="true" dir="rtl" spellcheck="false"></div>
+      <div class="placeholder-hint" id="placeholderHint">سيظهر نص الكلام هنا... أو اكتب هنا</div>
+    </div>
+
+    <div class="transcript-actions">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+        <button class="translate-btn" id="translateBtn">⚡ Translate</button>
+        <button class="keyboard-btn" id="keyboardToggleBtn">⌨️ Arabic Keyboard</button>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <span class="shortcut-hint">Space = mic</span>
+        <span class="shortcut-hint">T = translate</span>
+      </div>
+    </div>
+
+    <!-- Arabic Virtual Keyboard -->
+    <div class="arabic-keyboard" id="arabicKeyboard">
+
+      <!-- Row 1: numbers / symbols -->
+      <div class="kb-row">
+        <button class="kb-key" data-char="١">١</button>
+        <button class="kb-key" data-char="٢">٢</button>
+        <button class="kb-key" data-char="٣">٣</button>
+        <button class="kb-key" data-char="٤">٤</button>
+        <button class="kb-key" data-char="٥">٥</button>
+        <button class="kb-key" data-char="٦">٦</button>
+        <button class="kb-key" data-char="٧">٧</button>
+        <button class="kb-key" data-char="٨">٨</button>
+        <button class="kb-key" data-char="٩">٩</button>
+        <button class="kb-key" data-char="٠">٠</button>
+        <button class="kb-key" data-char="،">،</button>
+        <button class="kb-key" data-char="؟">؟</button>
+        <button class="kb-key" data-char="!">!</button>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="kb-row">
+        <button class="kb-key" data-char="ض">ض</button>
+        <button class="kb-key" data-char="ص">ص</button>
+        <button class="kb-key" data-char="ث">ث</button>
+        <button class="kb-key" data-char="ق">ق</button>
+        <button class="kb-key" data-char="ف">ف</button>
+        <button class="kb-key" data-char="غ">غ</button>
+        <button class="kb-key" data-char="ع">ع</button>
+        <button class="kb-key" data-char="ه">ه</button>
+        <button class="kb-key" data-char="خ">خ</button>
+        <button class="kb-key" data-char="ح">ح</button>
+        <button class="kb-key" data-char="ج">ج</button>
+        <button class="kb-key" data-char="د">د</button>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="kb-row">
+        <button class="kb-key" data-char="ش">ش</button>
+        <button class="kb-key" data-char="س">س</button>
+        <button class="kb-key" data-char="ي">ي</button>
+        <button class="kb-key" data-char="ب">ب</button>
+        <button class="kb-key" data-char="ل">ل</button>
+        <button class="kb-key" data-char="ا">ا</button>
+        <button class="kb-key" data-char="ت">ت</button>
+        <button class="kb-key" data-char="ن">ن</button>
+        <button class="kb-key" data-char="م">م</button>
+        <button class="kb-key" data-char="ك">ك</button>
+        <button class="kb-key" data-char="ط">ط</button>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="kb-row">
+        <button class="kb-key" data-char="ئ">ئ</button>
+        <button class="kb-key" data-char="ء">ء</button>
+        <button class="kb-key" data-char="ؤ">ؤ</button>
+        <button class="kb-key" data-char="ر">ر</button>
+        <button class="kb-key" data-char="لا">لا</button>
+        <button class="kb-key" data-char="ى">ى</button>
+        <button class="kb-key" data-char="ة">ة</button>
+        <button class="kb-key" data-char="و">و</button>
+        <button class="kb-key" data-char="ز">ز</button>
+        <button class="kb-key" data-char="ظ">ظ</button>
+        <button class="kb-key" data-char="ذ">ذ</button>
+        <button class="kb-key" data-char="إ">إ</button>
+        <button class="kb-key" data-char="أ">أ</button>
+        <button class="kb-key" data-char="آ">آ</button>
+      </div>
+
+      <!-- Row 5: actions -->
+      <div class="kb-row kb-row-actions">
+        <button class="kb-key special" data-action="backspace">⌫ Del</button>
+        <button class="kb-key special space-key" data-action="space">Space · مسافة</button>
+        <button class="kb-key special" data-action="clear-word">⌦ Word</button>
+        <button class="kb-key special translate-key" data-action="translate">⚡ Translate</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Output Grid -->
+  <div class="output-grid">
+
+    <!-- French Panel -->
+    <div class="lang-panel fr" id="frPanel">
+      <div class="lang-header">
+        <div class="lang-title">
+          <span class="lang-flag">🇫🇷</span>
+          <span class="lang-name">Français</span>
+        </div>
+        <div class="lang-actions">
+          <div class="rate-wrap">
+            <span class="rate-label">Speed</span>
+            <input type="range" class="rate-slider" id="frRateSlider" min="0.5" max="2" step="0.1" value="1"/>
+          </div>
+          <select class="voice-select" id="frVoiceSelect"></select>
+          <button class="icon-btn" id="frCopyBtn" title="Copy latest">📋</button>
+          <button class="icon-btn" id="frPlayBtn" title="Play latest">▶</button>
+          <button class="icon-btn" id="frFullBtn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="frSearch" placeholder="Search translations..."/>
+      </div>
+
+      <div class="translation-history" id="frHistory">
+        <div class="empty-state"><div class="empty-icon">🇫🇷</div>En attente...</div>
+      </div>
+      <button class="replay-btn" id="frReplayBtn" disabled>🔁 Replay last</button>
+    </div>
+
+    <!-- English Panel -->
+    <div class="lang-panel en" id="enPanel">
+      <div class="lang-header">
+        <div class="lang-title">
+          <span class="lang-flag">🇬🇧</span>
+          <span class="lang-name">English</span>
+        </div>
+        <div class="lang-actions">
+          <div class="rate-wrap">
+            <span class="rate-label">Speed</span>
+            <input type="range" class="rate-slider" id="enRateSlider" min="0.5" max="2" step="0.1" value="1"/>
+          </div>
+          <select class="voice-select" id="enVoiceSelect"></select>
+          <button class="icon-btn" id="enCopyBtn" title="Copy latest">📋</button>
+          <button class="icon-btn" id="enPlayBtn" title="Play latest">▶</button>
+          <button class="icon-btn" id="enFullBtn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="enSearch" placeholder="Search translations..."/>
+      </div>
+
+      <div class="translation-history" id="enHistory">
+        <div class="empty-state"><div class="empty-icon">🇬🇧</div>Waiting...</div>
+      </div>
+      <button class="replay-btn" id="enReplayBtn" disabled>🔁 Replay last</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- Fullscreen close -->
+<button class="fullscreen-close" id="fullscreenClose">✕</button>
+
+<footer>كلامي · Kalami v2.1 · Arabic Voice Translator · All Browser Native · No Data Stored</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const state = {
+  mode: 'manual',
+  isListening: false,
+  isProcessing: false,
+  autoPlay: false,
+  backTrans: false,
+  nearLive: false,
+  speakLang: 'fr',  // 'fr' | 'en' | 'both'
+  audioQueue: [],
+  audioPlaying: false,
+  recognition: null,
+  _stopRequested: false,
+  frHistory: [],   // {text, ts, starred, backAr}
+  enHistory: [],
+  sessionLog: [],  // {ar, fr, en, ts}
+  translationMemory: {},  // ar_text -> {fr, en}
+  frSearch: '',
+  enSearch: '',
+  fullscreenLang: null,
+};
+
+// ═══════════════════════════════════════════════════════
+// ELEMENTS
+// ═══════════════════════════════════════════════════════
+const micBtn         = document.getElementById('micBtn');
+const micLabel       = document.getElementById('micLabel');
+const waveform       = document.getElementById('waveform');
+const transcriptBox  = document.getElementById('transcriptBox');
+const placeholderHint= document.getElementById('placeholderHint');
+const statusBar      = document.getElementById('statusBar');
+const statusText     = document.getElementById('statusText');
+const memoryBadge    = document.getElementById('memoryBadge');
+const modeToggle     = document.getElementById('modeToggle');
+const modeBadge      = document.getElementById('modeBadge');
+const dialectSelect  = document.getElementById('dialectSelect');
+const autoPlayBtn    = document.getElementById('autoPlayBtn');
+const backTransBtn   = document.getElementById('backTransBtn');
+const nearLiveBtn    = document.getElementById('nearLiveBtn');
+const speakLangWrap  = document.getElementById('speakLangWrap');
+const speakLangBtns  = document.querySelectorAll('.speak-lang-btn');
+const liveChunkBadge = document.getElementById('liveChunkBadge');
+const fontSlider     = document.getElementById('fontSlider');
+const shortcutsBtn   = document.getElementById('shortcutsBtn');
+const shortcutsPanel = document.getElementById('shortcutsPanel');
+const exportTxtBtn   = document.getElementById('exportTxtBtn');
+const exportPdfBtn   = document.getElementById('exportPdfBtn');
+const clearBtn       = document.getElementById('clearBtn');
+const translateBtn   = document.getElementById('translateBtn');
+const keyboardToggleBtn = document.getElementById('keyboardToggleBtn');
+const arabicKeyboard = document.getElementById('arabicKeyboard');
+const frHistory      = document.getElementById('frHistory');
+const enHistory      = document.getElementById('enHistory');
+const frVoiceSel     = document.getElementById('frVoiceSelect');
+const enVoiceSel     = document.getElementById('enVoiceSelect');
+const frRateSlider   = document.getElementById('frRateSlider');
+const enRateSlider   = document.getElementById('enRateSlider');
+const frCopyBtn      = document.getElementById('frCopyBtn');
+const enCopyBtn      = document.getElementById('enCopyBtn');
+const frPlayBtn      = document.getElementById('frPlayBtn');
+const enPlayBtn      = document.getElementById('enPlayBtn');
+const frFullBtn      = document.getElementById('frFullBtn');
+const enFullBtn      = document.getElementById('enFullBtn');
+const frReplayBtn    = document.getElementById('frReplayBtn');
+const enReplayBtn    = document.getElementById('enReplayBtn');
+const frSearch       = document.getElementById('frSearch');
+const enSearch       = document.getElementById('enSearch');
+const frPanel        = document.getElementById('frPanel');
+const enPanel        = document.getElementById('enPanel');
+const fullscreenClose= document.getElementById('fullscreenClose');
+const toast          = document.getElementById('toast');
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function setStatus(s, msg) {
+  statusBar.className = `status-bar ${s}`;
+  statusText.textContent = msg;
+}
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function getTranscript() {
+  return transcriptBox.textContent.trim();
+}
+
+function setTranscript(txt) {
+  transcriptBox.textContent = txt;
+  placeholderHint.style.opacity = txt ? '0' : '1';
+}
+
+// ═══════════════════════════════════════════════════════
+// PLACEHOLDER
+// ═══════════════════════════════════════════════════════
+transcriptBox.addEventListener('input', () => {
+  const t = getTranscript();
+  placeholderHint.style.opacity = t ? '0' : '1';
+});
+
+// ═══════════════════════════════════════════════════════
+// VOICES
+// ═══════════════════════════════════════════════════════
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+
+  const populate = (sel, voices, fallback) => {
+    sel.innerHTML = '';
+    if (!voices.length) {
+      const o = document.createElement('option'); o.textContent = fallback; sel.appendChild(o); return;
+    }
+    voices.forEach((v, i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = v.name.replace(/Google |Microsoft /g,'').slice(0,18);
+      sel.appendChild(o);
+    });
+  };
+  populate(frVoiceSel, frVoices, 'Default FR');
+  populate(enVoiceSel, enVoices, 'Default EN');
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+
+// ═══════════════════════════════════════════════════════
+// AUDIO QUEUE ENGINE
+// ═══════════════════════════════════════════════════════
+function enqueueSpeak(text, lang, voiceSel, rateSlider, playBtn) {
+  state.audioQueue.push({ text, lang, voiceSel, rateSlider, playBtn });
+  if (!state.audioPlaying) processAudioQueue();
+}
+
+function processAudioQueue() {
+  if (!state.audioQueue.length) { state.audioPlaying = false; return; }
+  state.audioPlaying = true;
+  const { text, lang, voiceSel, rateSlider, playBtn } = state.audioQueue.shift();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = parseFloat(rateSlider.value);
+  const langPrefix = lang.split('-')[0];
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith(langPrefix));
+  if (voices.length && voiceSel.value !== '') u.voice = voices[parseInt(voiceSel.value)] || voices[0];
+  if (playBtn) { playBtn.textContent = '⏹'; playBtn.classList.add('playing'); }
+  u.onend = u.onerror = () => {
+    if (playBtn) { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
+    processAudioQueue();
+  };
+  speechSynthesis.speak(u);
+}
+
+function clearAudioQueue() {
+  state.audioQueue = [];
+  state.audioPlaying = false;
+  speechSynthesis.cancel();
+}
+
+function speakByLang(frText, enText) {
+  const lang = state.speakLang;
+  if (lang === 'fr' || lang === 'both') {
+    enqueueSpeak(frText, 'fr-FR', frVoiceSel, frRateSlider, frPlayBtn);
+  }
+  if (lang === 'en' || lang === 'both') {
+    enqueueSpeak(enText, 'en-GB', enVoiceSel, enRateSlider, enPlayBtn);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SPEECH SYNTHESIS
+// ═══════════════════════════════════════════════════════
+function speak(text, lang, voiceSel, rateSlider, playBtn) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = parseFloat(rateSlider.value);
+  const langPrefix = lang.split('-')[0];
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith(langPrefix));
+  if (voices.length && voiceSel.value !== '') {
+    u.voice = voices[parseInt(voiceSel.value)] || voices[0];
+  }
+  if (playBtn) {
+    playBtn.textContent = '⏹';
+    playBtn.classList.add('playing');
+    u.onend = u.onerror = () => { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); };
+  }
+  speechSynthesis.speak(u);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER HISTORY
+// ═══════════════════════════════════════════════════════
+function renderHistory(container, arr, searchTerm, lang) {
+  if (!arr.length) {
+    container.innerHTML = lang === 'fr'
+      ? '<div class="empty-state"><div class="empty-icon">🇫🇷</div>En attente...</div>'
+      : '<div class="empty-state"><div class="empty-icon">🇬🇧</div>Waiting...</div>';
+    return;
+  }
+
+  const filtered = searchTerm
+    ? arr.filter(item => item.text.toLowerCase().includes(searchTerm.toLowerCase()))
+    : arr;
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div>No results</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.slice().reverse().map((item, idx) => {
+    const isNewest = idx === 0 && !searchTerm;
+    const starred = item.starred ? 'starred' : '';
+    const starIcon = item.starred ? '⭐' : '☆';
+    const backHtml = item.backAr
+      ? `<div class="backtrans-text show">↩ ${esc(item.backAr)}</div>`
+      : '';
+    return `<div class="translation-entry ${isNewest ? 'newest' : ''} ${starred}" data-id="${item.id}">
+      ${esc(item.text)}
+      ${backHtml}
+      <div class="entry-actions">
+        <span class="entry-star" data-id="${item.id}" data-lang="${lang}" title="Star this">${starIcon}</span>
+        <span style="font-size:.65rem;font-family:'DM Mono',monospace;color:var(--muted);">${item.ts}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// BACK-TRANSLATION
+// ═══════════════════════════════════════════════════════
+async function fetchBackTranslation(frText, enText) {
+  if (!state.backTrans) return { backFr: null, backEn: null };
+  try {
+    const [rFr, rEn] = await Promise.all([
+      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(frText)}&langpair=fr|ar`),
+      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(enText)}&langpair=en|ar`)
+    ]);
+    const [dFr, dEn] = await Promise.all([rFr.json(), rEn.json()]);
+    return {
+      backFr: dFr.responseData?.translatedText || null,
+      backEn: dEn.responseData?.translatedText || null,
+    };
+  } catch { return { backFr: null, backEn: null }; }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// NEAR-LIVE CHUNK TRANSLATION
+// ═══════════════════════════════════════════════════════
+async function translateChunkLive(text) {
+  if (!text) return;
+  liveChunkBadge.classList.add('show');
+  try {
+    const memKey = text.toLowerCase();
+    let frText, enText;
+
+    if (state.translationMemory[memKey]) {
+      frText = state.translationMemory[memKey].fr;
+      enText = state.translationMemory[memKey].en;
+    } else {
+      const [frRes, enRes] = await Promise.all([
+        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|fr`),
+        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|en`)
+      ]);
+      const [frData, enData] = await Promise.all([frRes.json(), enRes.json()]);
+      frText = frData.responseData?.translatedText || '';
+      enText = enData.responseData?.translatedText || '';
+      if (frText || enText) state.translationMemory[memKey] = { fr: frText, en: enText };
+    }
+
+    if (frText || enText) {
+      addEntries(text, frText, enText, null, null);
+      speakByLang(frText, enText);
+    }
+  } catch(e) { /* silent — don't break listening flow */ }
+  finally { liveChunkBadge.classList.remove('show'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// TRANSLATION
+// ═══════════════════════════════════════════════════════
+let entryCounter = 0;
+
+async function translateText(text) {
+  if (!text.trim()) { showToast('⚠️ Nothing to translate.'); return; }
+
+  // Check translation memory
+  const memKey = text.trim().toLowerCase();
+  if (state.translationMemory[memKey]) {
+    const cached = state.translationMemory[memKey];
+    memoryBadge.classList.add('show');
+    setTimeout(() => memoryBadge.classList.remove('show'), 2000);
+    addEntries(text, cached.fr, cached.en, null, null);
+    setStatus('ready', 'From memory ⚡');
+    if (state.autoPlay) autoPlayBoth(cached.fr, cached.en);
+    return;
+  }
+
+  state.isProcessing = true;
+  setStatus('processing', 'Translating...');
+  memoryBadge.classList.remove('show');
+
+  try {
+    const [frRes, enRes] = await Promise.all([
+      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|fr`),
+      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|en`)
+    ]);
+    const [frData, enData] = await Promise.all([frRes.json(), enRes.json()]);
+
+    const frText = frData.responseData?.translatedText || '';
+    const enText = enData.responseData?.translatedText || '';
+
+    if (!frText && !enText) throw new Error('No translation');
+
+    // Save to memory
+    state.translationMemory[memKey] = { fr: frText, en: enText };
+
+    // Back-translation
+    const { backFr, backEn } = await fetchBackTranslation(frText, enText);
+
+    addEntries(text, frText, enText, backFr, backEn);
+    setStatus('ready', 'Translation complete');
+
+    if (state.autoPlay) autoPlayBoth(frText, enText);
+
+  } catch(err) {
+    setStatus('error', 'Translation failed');
+    showToast('⚠️ Translation failed. Check connection.');
+  } finally {
+    state.isProcessing = false;
+    if (state.mode === 'manual') setTimeout(() => setStatus('', 'Ready'), 2500);
+  }
+}
+
+function addEntries(arText, frText, enText, backFr, backEn) {
+  const ts = new Date().toLocaleTimeString();
+  const id = ++entryCounter;
+
+  state.frHistory.push({ id, text: frText, ts, starred: false, backAr: backFr });
+  state.enHistory.push({ id, text: enText, ts, starred: false, backAr: backEn });
+  state.sessionLog.push({ ar: arText, fr: frText, en: enText, ts });
+
+  renderHistory(frHistory, state.frHistory, state.frSearch, 'fr');
+  renderHistory(enHistory, state.enHistory, state.enSearch, 'en');
+
+  frReplayBtn.disabled = false;
+  enReplayBtn.disabled = false;
+}
+
+function autoPlayBoth(frText, enText) {
+  setTimeout(() => speakByLang(frText, enText), 200);
+}
+
+// ═══════════════════════════════════════════════════════
+// STAR
+// ═══════════════════════════════════════════════════════
+document.addEventListener('click', e => {
+  const starEl = e.target.closest('.entry-star');
+  if (!starEl) return;
+  const id = parseInt(starEl.dataset.id);
+  const lang = starEl.dataset.lang;
+  const arr = lang === 'fr' ? state.frHistory : state.enHistory;
+  const item = arr.find(x => x.id === id);
+  if (item) {
+    item.starred = !item.starred;
+    renderHistory(
+      lang === 'fr' ? frHistory : enHistory,
+      arr,
+      lang === 'fr' ? state.frSearch : state.enSearch,
+      lang
+    );
+    showToast(item.starred ? '⭐ Starred!' : '☆ Unstarred');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// SPEECH RECOGNITION
+// ═══════════════════════════════════════════════════════
+function buildRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('❌ Not supported. Use Chrome/Edge.');
+    micBtn.disabled = true;
+    return null;
+  }
+
+  const rec = new SR();
+  rec.lang = dialectSelect.value;
+  rec.interimResults = true;
+  rec.continuous = state.mode === 'continuous';
+  rec.maxAlternatives = 1;
+
+  let finalTranscript = '';
+
+  rec.onstart = () => {
+    state.isListening = true;
+    finalTranscript = '';
+    waveform.classList.add('active');
+    micBtn.classList.add('listening');
+    setStatus('listening', state.mode === 'continuous' ? 'Listening continuously...' : 'Listening...');
+    micLabel.textContent = 'Click to stop';
+    placeholderHint.style.opacity = '0';
+  };
+
+  rec.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalTranscript += t + ' ';
+        if (state.mode === 'continuous') {
+          setTranscript(finalTranscript.trim());
+          translateText(t.trim());
+        } else if (state.nearLive && t.trim()) {
+          translateChunkLive(t.trim());
+        }
+      } else {
+        interim += t;
+      }
+    }
+    const display = (finalTranscript + interim).trim();
+    setTranscript(display);
+  };
+
+  rec.onend = () => {
+    state.isListening = false;
+    waveform.classList.remove('active');
+    micBtn.classList.remove('listening', 'processing');
+
+    if (state.mode === 'continuous' && !state._stopRequested) {
+      setTimeout(() => {
+        if (state.mode === 'continuous' && !state._stopRequested) {
+          try { rec.start(); } catch(e) {}
+        }
+      }, 300);
+      return;
+    }
+
+    micLabel.textContent = 'Click to speak';
+    state._stopRequested = false;
+
+    if (state.mode === 'manual' && finalTranscript.trim()) {
+      translateText(finalTranscript.trim());
+    } else if (!finalTranscript.trim()) {
+      setStatus('', 'Ready');
+    }
+  };
+
+  rec.onerror = e => {
+    if (e.error === 'no-speech' || e.error === 'aborted') return;
+    setStatus('error', `Error: ${e.error}`);
+    showToast(`❌ Mic: ${e.error}`);
+    state.isListening = false;
+    waveform.classList.remove('active');
+    micBtn.classList.remove('listening');
+    micLabel.textContent = 'Click to speak';
+  };
+
+  return rec;
+}
+
+function toggleMic() {
+  if (state.isProcessing) return;
+  if (!state.recognition) state.recognition = buildRecognition();
+  if (!state.recognition) return;
+
+  if (state.isListening) {
+    state._stopRequested = true;
+    state.recognition.stop();
+    waveform.classList.remove('active');
+    micBtn.classList.remove('listening');
+    micLabel.textContent = 'Click to speak';
+    setStatus('processing', 'Processing...');
+  } else {
+    state.recognition = buildRecognition();
+    if (!state.recognition) return;
+    try { state.recognition.start(); }
+    catch { showToast('❌ Could not start mic.'); }
+  }
+}
+
+micBtn.addEventListener('click', toggleMic);
+
+// ═══════════════════════════════════════════════════════
+// MODE TOGGLE
+// ═══════════════════════════════════════════════════════
+modeToggle.addEventListener('change', () => {
+  if (state.isListening) { state._stopRequested = true; if(state.recognition) state.recognition.stop(); }
+  state.mode = modeToggle.checked ? 'continuous' : 'manual';
+  state.recognition = null;
+  modeBadge.textContent = state.mode === 'continuous' ? 'Continuous' : 'Manual';
+  modeBadge.className = `mode-badge ${state.mode === 'continuous' ? 'continuous' : ''}`;
+  micLabel.textContent = 'Click to speak';
+  setStatus('', 'Ready');
+  waveform.classList.remove('active');
+  micBtn.classList.remove('listening');
+  showToast(state.mode === 'continuous' ? '🔄 Continuous mode' : '✋ Manual mode');
+});
+
+
+// ═══════════════════════════════════════════════════════
+// NEAR-LIVE TOGGLE
+// ═══════════════════════════════════════════════════════
+nearLiveBtn.addEventListener('click', () => {
+  state.nearLive = !state.nearLive;
+  nearLiveBtn.classList.toggle('active', state.nearLive);
+  showToast(state.nearLive ? '⚡ Near-Live on — translating each phrase!' : '⚡ Near-Live off');
+});
+
+// SPEAK LANGUAGE SELECTOR
+speakLangBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    speakLangBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.speakLang = btn.dataset.lang;
+    const labels = { fr: '🇫🇷 French', en: '🇬🇧 English', both: '🇫🇷+🇬🇧 Both' };
+    showToast(`🔊 Speaking: ${labels[state.speakLang]}`);
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// AUTO-PLAY
+// ═══════════════════════════════════════════════════════
+autoPlayBtn.addEventListener('click', () => {
+  state.autoPlay = !state.autoPlay;
+  autoPlayBtn.classList.toggle('active', state.autoPlay);
+  showToast(state.autoPlay ? '🔊 Auto-play on' : '🔇 Auto-play off');
+});
+
+// ═══════════════════════════════════════════════════════
+// BACK-TRANSLATION
+// ═══════════════════════════════════════════════════════
+backTransBtn.addEventListener('click', () => {
+  state.backTrans = !state.backTrans;
+  backTransBtn.classList.toggle('active', state.backTrans);
+  showToast(state.backTrans ? '↩ Verify mode on' : '↩ Verify mode off');
+});
+
+// ═══════════════════════════════════════════════════════
+// TRANSLATE BUTTON
+// ═══════════════════════════════════════════════════════
+translateBtn.addEventListener('click', () => {
+  const t = getTranscript();
+  if (t) translateText(t);
+  else showToast('⚠️ Nothing to translate.');
+});
+
+// ═══════════════════════════════════════════════════════
+// ARABIC KEYBOARD
+// ═══════════════════════════════════════════════════════
+keyboardToggleBtn.addEventListener('click', () => {
+  const visible = arabicKeyboard.classList.toggle('visible');
+  keyboardToggleBtn.classList.toggle('active', visible);
+  if (visible) transcriptBox.focus();
+});
+
+arabicKeyboard.addEventListener('click', e => {
+  const key = e.target.closest('.kb-key');
+  if (!key) return;
+
+  const char = key.dataset.char;
+  const action = key.dataset.action;
+
+  if (char) {
+    // Insert at cursor or append
+    transcriptBox.focus();
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(char));
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      transcriptBox.textContent += char;
+    }
+    placeholderHint.style.opacity = '0';
+  } else if (action === 'backspace') {
+    const t = transcriptBox.textContent;
+    transcriptBox.textContent = t.slice(0, -1);
+    placeholderHint.style.opacity = transcriptBox.textContent ? '0' : '1';
+  } else if (action === 'space') {
+    transcriptBox.focus();
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(' '));
+      range.collapse(false);
+    } else {
+      transcriptBox.textContent += ' ';
+    }
+  } else if (action === 'clear-word') {
+    const t = transcriptBox.textContent;
+    const trimmed = t.trimEnd();
+    const lastSpace = trimmed.lastIndexOf(' ');
+    transcriptBox.textContent = lastSpace >= 0 ? trimmed.slice(0, lastSpace + 1) : '';
+    placeholderHint.style.opacity = transcriptBox.textContent ? '0' : '1';
+  } else if (action === 'translate') {
+    const t = getTranscript();
+    if (t) translateText(t);
+    else showToast('⚠️ Nothing to translate.');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// PLAY BUTTONS
+// ═══════════════════════════════════════════════════════
+frPlayBtn.addEventListener('click', () => {
+  if (!state.frHistory.length) return;
+  speak(state.frHistory[state.frHistory.length-1].text, 'fr-FR', frVoiceSel, frRateSlider, frPlayBtn);
+});
+enPlayBtn.addEventListener('click', () => {
+  if (!state.enHistory.length) return;
+  speak(state.enHistory[state.enHistory.length-1].text, 'en-GB', enVoiceSel, enRateSlider, enPlayBtn);
+});
+frReplayBtn.addEventListener('click', () => {
+  if (!state.frHistory.length) return;
+  speak(state.frHistory[state.frHistory.length-1].text, 'fr-FR', frVoiceSel, frRateSlider, frPlayBtn);
+});
+enReplayBtn.addEventListener('click', () => {
+  if (!state.enHistory.length) return;
+  speak(state.enHistory[state.enHistory.length-1].text, 'en-GB', enVoiceSel, enRateSlider, enPlayBtn);
+});
+
+// ═══════════════════════════════════════════════════════
+// COPY
+// ═══════════════════════════════════════════════════════
+async function copyLatest(arr, btn) {
+  if (!arr.length) { showToast('Nothing to copy.'); return; }
+  try {
+    await navigator.clipboard.writeText(arr[arr.length-1].text);
+    btn.textContent = '✅'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1500);
+    showToast('📋 Copied!');
+  } catch { showToast('❌ Copy failed.'); }
+}
+frCopyBtn.addEventListener('click', () => copyLatest(state.frHistory, frCopyBtn));
+enCopyBtn.addEventListener('click', () => copyLatest(state.enHistory, enCopyBtn));
+
+// ═══════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════
+frSearch.addEventListener('input', () => {
+  state.frSearch = frSearch.value.trim();
+  renderHistory(frHistory, state.frHistory, state.frSearch, 'fr');
+});
+enSearch.addEventListener('input', () => {
+  state.enSearch = enSearch.value.trim();
+  renderHistory(enHistory, state.enHistory, state.enSearch, 'en');
+});
+
+// ═══════════════════════════════════════════════════════
+// FULLSCREEN
+// ═══════════════════════════════════════════════════════
+frFullBtn.addEventListener('click', () => toggleFullscreen('fr'));
+enFullBtn.addEventListener('click', () => toggleFullscreen('en'));
+fullscreenClose.addEventListener('click', closeFullscreen);
+
+function toggleFullscreen(lang) {
+  if (state.fullscreenLang === lang) { closeFullscreen(); return; }
+  closeFullscreen();
+  state.fullscreenLang = lang;
+  const panel = lang === 'fr' ? frPanel : enPanel;
+  panel.classList.add('fullscreen-mode');
+  fullscreenClose.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFullscreen() {
+  if (!state.fullscreenLang) return;
+  const panel = state.fullscreenLang === 'fr' ? frPanel : enPanel;
+  panel.classList.remove('fullscreen-mode');
+  fullscreenClose.classList.remove('visible');
+  document.body.style.overflow = '';
+  state.fullscreenLang = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// CLEAR
+// ═══════════════════════════════════════════════════════
+clearBtn.addEventListener('click', () => {
+  state.frHistory = [];
+  state.enHistory = [];
+  state.sessionLog = [];
+  renderHistory(frHistory, [], '', 'fr');
+  renderHistory(enHistory, [], '', 'en');
+  setTranscript('');
+  frReplayBtn.disabled = true;
+  enReplayBtn.disabled = true;
+  frSearch.value = ''; enSearch.value = '';
+  state.frSearch = ''; state.enSearch = '';
+  clearAudioQueue();
+  setStatus('', 'Ready');
+  showToast('🗑️ Cleared');
+});
+
+// ═══════════════════════════════════════════════════════
+// EXPORT TXT
+// ═══════════════════════════════════════════════════════
+exportTxtBtn.addEventListener('click', () => {
+  if (!state.sessionLog.length) { showToast('Nothing to export.'); return; }
+  const lines = ['كلامي · Kalami v2 — Session Transcript', '═'.repeat(52), ''];
+  state.sessionLog.forEach((item, i) => {
+    lines.push(`[${item.ts}] — Entry ${i+1}`);
+    lines.push(`🇸🇦  ${item.ar}`);
+    lines.push(`🇫🇷  ${item.fr}`);
+    lines.push(`🇬🇧  ${item.en}`);
+    lines.push('');
+  });
+  lines.push('═'.repeat(52));
+  lines.push(`Exported: ${new Date().toLocaleString()}`);
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `kalami-${Date.now()}.txt`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📄 TXT exported!');
+});
+
+// ═══════════════════════════════════════════════════════
+// EXPORT PDF
+// ═══════════════════════════════════════════════════════
+exportPdfBtn.addEventListener('click', () => {
+  if (!state.sessionLog.length) { showToast('Nothing to export.'); return; }
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'Syne',sans-serif;background:#fff;color:#111;padding:2.5rem;max-width:800px;margin:auto;}
+    h1{font-size:1.5rem;font-weight:800;margin-bottom:.25rem;}
+    .bism{font-family:'Amiri',serif;font-size:1.6rem;text-align:center;color:#c47a10;margin-bottom:1.5rem;}
+    .entry{border:1px solid #ddd;border-radius:10px;padding:1rem;margin-bottom:1rem;page-break-inside:avoid;}
+    .entry-head{font-size:.7rem;font-weight:700;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+    .ar{font-family:'Amiri',serif;font-size:1.2rem;direction:rtl;text-align:right;margin-bottom:.5rem;}
+    .fr{color:#1a5fc8;margin-bottom:.3rem;}
+    .en{color:#0a7a60;}
+    .label{font-weight:700;font-size:.75rem;margin-right:.3rem;}
+    .footer{margin-top:2rem;font-size:.65rem;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:1rem;}
+  </style></head><body>
+  <div class="bism">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <h1>كلامي · Kalami — Session Transcript</h1>
+  <p style="font-size:.8rem;color:#888;margin-bottom:1.5rem;">Generated: ${new Date().toLocaleString()}</p>`);
+
+  state.sessionLog.forEach((item, i) => {
+    win.document.write(`
+      <div class="entry">
+        <div class="entry-head">Entry ${i+1} · ${item.ts}</div>
+        <div class="ar">${esc(item.ar)}</div>
+        <div class="fr"><span class="label">🇫🇷 FR</span>${esc(item.fr)}</div>
+        <div class="en"><span class="label">🇬🇧 EN</span>${esc(item.en)}</div>
+      </div>`);
+  });
+
+  win.document.write(`<div class="footer">كلامي · Kalami v2.1 · Arabic Voice Translator</div></body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 600);
+  showToast('📑 PDF ready — print/save dialog opened');
+});
+
+// ═══════════════════════════════════════════════════════
+// FONT SIZE
+// ═══════════════════════════════════════════════════════
+fontSlider.addEventListener('input', () => {
+  document.documentElement.style.setProperty('--font-scale', fontSlider.value);
+});
+
+// ═══════════════════════════════════════════════════════
+// SHORTCUTS PANEL
+// ═══════════════════════════════════════════════════════
+shortcutsBtn.addEventListener('click', () => {
+  shortcutsPanel.classList.toggle('visible');
+});
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  // Don't trigger when typing in inputs / contenteditable
+  const tag = document.activeElement.tagName;
+  const isEditable = document.activeElement.isContentEditable
+    || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
+
+  if (e.key === 'Escape') { closeFullscreen(); return; }
+  if (isEditable && e.key !== 'Escape') return;
+
+  switch(e.key) {
+    case ' ': e.preventDefault(); toggleMic(); break;
+    case 't': case 'T':
+      e.preventDefault();
+      const t = getTranscript();
+      if (t) translateText(t); else showToast('⚠️ Nothing to translate.');
+      break;
+    case 'c': case 'C':
+      e.preventDefault();
+      clearBtn.click();
+      break;
+    case 'e': case 'E':
+      e.preventDefault();
+      exportTxtBtn.click();
+      break;
+    case 'k': case 'K':
+      e.preventDefault();
+      keyboardToggleBtn.click();
+      break;
+    case 'f': case 'F':
+      e.preventDefault();
+      toggleFullscreen('fr');
+      break;
+    case 'g': case 'G':
+      e.preventDefault();
+      toggleFullscreen('en');
+      break;
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+setStatus('', 'Ready');
+placeholderHint.style.opacity = '1';
+
+if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+  micLabel.textContent = 'Not supported';
+  micBtn.disabled = true;
+  setStatus('error', 'Use Chrome or Edge');
+  showToast('❌ Speech recognition needs Chrome/Edge');
+}
+</script>
+</body>
+</html>

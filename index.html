@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="كلامي Kalami — Browser-native Arabic voice translator. Speak Arabic, hear French and English instantly."/>
+<meta property="og:title" content="كلامي · Kalami — Arabic Voice Translator"/>
+<meta property="og:description" content="Speak Arabic. Hear French & English. No API key. No server. One HTML file."/>
+<title>كلامي · Kalami — Arabic Voice Translator</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --void:       #030508;
+  --deep:       #07101e;
+  --surface:    #0c1828;
+  --gold:       #c8922a;
+  --gold2:      #e8b84b;
+  --gold3:      #f5d98a;
+  --gold-glow:  rgba(200,146,42,.18);
+  --teal:       #1a9f88;
+  --teal2:      #2dd4b8;
+  --text:       #e8dcc8;
+  --text2:      #9a8870;
+  --muted:      #3a4a5a;
+  --border:     rgba(200,146,42,.18);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:'Cinzel',serif;
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ══════════════════════════════════════
+   ANIMATED ISLAMIC GEOMETRIC CANVAS
+══════════════════════════════════════ */
+#geoCanvas{
+  position:fixed;inset:0;z-index:0;
+  opacity:.55;pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   GRAIN OVERLAY
+══════════════════════════════════════ */
+body::after{
+  content:'';position:fixed;inset:0;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;opacity:.4;
+}
+
+body>*:not(#geoCanvas){position:relative;z-index:2;}
+
+/* ══════════════════════════════════════
+   TILE BORDER
+══════════════════════════════════════ */
+.tile-border{
+  height:5px;width:100%;
+  background:linear-gradient(90deg,
+    var(--gold) 0%,var(--teal) 25%,var(--gold) 50%,var(--teal) 75%,var(--gold) 100%);
+  opacity:.7;
+}
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:4rem 2rem 5rem;
+  position:relative;
+}
+
+/* Radial gold halo behind hero text */
+.hero::before{
+  content:'';
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:700px;height:700px;
+  background:radial-gradient(ellipse at center,
+    rgba(200,146,42,.08) 0%,
+    rgba(200,146,42,.03) 40%,
+    transparent 70%);
+  pointer-events:none;
+  border-radius:50%;
+}
+
+.bismillah{
+  font-family:'Amiri',serif;
+  font-size:clamp(1.8rem,5vw,3.4rem);
+  color:var(--gold2);
+  letter-spacing:.06em;
+  line-height:1.7;
+  text-shadow:0 0 60px rgba(232,184,75,.35), 0 2px 8px rgba(0,0,0,.8);
+  margin-bottom:1.2rem;
+  animation:fadeDown .9s ease both;
+}
+
+.hero-ornament{
+  color:var(--gold);font-size:.9rem;
+  letter-spacing:.6em;margin-bottom:1.6rem;
+  opacity:.6;
+  animation:fadeDown 1s ease both .1s;
+}
+
+.hero-name{
+  font-family:'Amiri',serif;
+  font-size:clamp(3rem,10vw,7rem);
+  font-weight:700;
+  color:transparent;
+  background:linear-gradient(135deg,var(--gold3) 0%,var(--gold2) 40%,var(--gold) 70%,var(--gold3) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  line-height:1.1;
+  text-shadow:none;
+  filter:drop-shadow(0 0 40px rgba(200,146,42,.4));
+  animation:fadeDown 1s ease both .2s;
+}
+
+.hero-roman{
+  font-family:'Cinzel',serif;
+  font-size:clamp(.8rem,2vw,1.1rem);
+  font-weight:400;
+  color:var(--text2);
+  letter-spacing:.45em;
+  text-transform:uppercase;
+  margin-top:.5rem;
+  animation:fadeDown 1s ease both .3s;
+}
+
+.hero-tagline{
+  font-family:'Amiri',serif;
+  font-size:clamp(1.1rem,2.5vw,1.55rem);
+  color:var(--text);
+  margin-top:1.8rem;
+  line-height:1.7;
+  max-width:580px;
+  opacity:.88;
+  animation:fadeDown 1s ease both .4s;
+}
+
+.hero-tagline span{color:var(--gold2);}
+
+/* Badges */
+.badges{
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:.6rem;
+  margin-top:1.8rem;
+  animation:fadeUp 1s ease both .5s;
+}
+
+.badge{
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.3rem .85rem;border-radius:20px;
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  font-weight:500;letter-spacing:.06em;
+  border:1px solid var(--border);
+  background:rgba(200,146,42,.06);color:var(--text2);
+  transition:all .25s;
+}
+.badge:hover{border-color:var(--gold);color:var(--gold2);background:rgba(200,146,42,.1);}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);}
+
+/* CTA Buttons */
+.cta-row{
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:1rem;
+  margin-top:2.5rem;
+  animation:fadeUp 1s ease both .6s;
+}
+
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.55rem;
+  padding:.85rem 2rem;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--void);
+  font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  text-decoration:none;border:none;cursor:pointer;
+  box-shadow:0 4px 30px rgba(200,146,42,.35);
+  transition:all .25s;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 40px rgba(200,146,42,.5);
+  background:linear-gradient(135deg,var(--gold2),var(--gold3));
+}
+
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:.55rem;
+  padding:.85rem 1.8rem;border-radius:10px;
+  border:1px solid var(--border);background:rgba(200,146,42,.05);
+  color:var(--gold2);
+  font-family:'Cinzel',serif;font-size:.82rem;font-weight:400;
+  letter-spacing:.12em;text-transform:uppercase;
+  text-decoration:none;cursor:pointer;
+  transition:all .25s;
+}
+.btn-secondary:hover{
+  border-color:var(--gold2);background:rgba(200,146,42,.1);
+  transform:translateY(-2px);
+}
+
+/* Scroll hint */
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  color:var(--muted);font-family:'DM Mono',monospace;font-size:.62rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  animation:fadeUp 1.2s ease both 1s;
+}
+.scroll-arrow{
+  width:20px;height:20px;
+  border-right:1px solid var(--muted);border-bottom:1px solid var(--muted);
+  transform:rotate(45deg);
+  animation:bounce 1.8s ease infinite;
+}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0);}50%{transform:rotate(45deg) translateY(5px);}}
+
+/* ══════════════════════════════════════
+   FEATURES SECTION
+══════════════════════════════════════ */
+.features{
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:5rem 2rem;
+}
+
+.section-header{
+  text-align:center;margin-bottom:3.5rem;
+}
+.section-label{
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  letter-spacing:.25em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:.75rem;
+}
+.section-title{
+  font-family:'Amiri',serif;
+  font-size:clamp(1.6rem,4vw,2.6rem);
+  color:var(--gold2);
+  text-shadow:0 0 30px rgba(232,184,75,.2);
+}
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.25rem;
+  max-width:1100px;margin:0 auto;
+}
+
+.feature-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:1.6rem 1.5rem;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(200,146,42,.4);
+  box-shadow:0 12px 40px rgba(0,0,0,.4),0 0 0 1px rgba(200,146,42,.1);
+}
+.feature-card:hover::before{opacity:1;}
+
+.fc-icon{font-size:1.8rem;margin-bottom:.8rem;display:block;}
+.fc-title{
+  font-family:'Cinzel',serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:.55rem;
+}
+.fc-desc{
+  font-family:'DM Mono',monospace;font-size:.72rem;
+  color:var(--text2);line-height:1.7;font-weight:400;
+}
+
+/* ══════════════════════════════════════
+   MODES SECTION
+══════════════════════════════════════ */
+.modes{
+  padding:5rem 2rem;
+  max-width:900px;margin:0 auto;
+}
+
+.mode-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.1rem;margin-top:3rem;
+}
+
+.mode-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;padding:1.8rem 1.5rem;
+  text-align:center;
+  transition:all .3s;
+}
+.mode-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+
+.mode-glyph{
+  font-family:'Amiri',serif;
+  font-size:2.5rem;color:var(--gold2);
+  display:block;margin-bottom:1rem;
+  text-shadow:0 0 20px rgba(232,184,75,.3);
+}
+.mode-name{
+  font-family:'Cinzel',serif;font-size:.8rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.6rem;
+}
+.mode-desc{
+  font-family:'DM Mono',monospace;font-size:.7rem;
+  color:var(--text2);line-height:1.7;
+}
+.mode-lag{
+  display:inline-block;margin-top:.8rem;
+  padding:.18rem .55rem;border-radius:20px;
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  border:1px solid rgba(26,159,136,.35);
+  background:rgba(26,159,136,.08);color:var(--teal2);
+}
+
+/* ══════════════════════════════════════
+   CALLIGRAPHY SECTION
+══════════════════════════════════════ */
+.calli-section{
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  padding:5rem 2rem;
+  text-align:center;
+}
+
+.calli-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.5rem;
+  max-width:1000px;margin:2.5rem auto 0;
+}
+
+.calli-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;padding:2rem 1.5rem;
+  transition:all .3s;
+}
+.calli-card:hover{border-color:rgba(200,146,42,.35);transform:translateY(-3px);}
+
+.calli-arabic{
+  font-family:'Amiri',serif;
+  font-size:1.55rem;
+  color:var(--gold2);
+  direction:rtl;line-height:2;
+  margin-bottom:.75rem;
+}
+.calli-source{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  color:var(--teal);letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:.4rem;
+}
+.calli-trans{
+  font-family:'Amiri',serif;font-style:italic;
+  font-size:.92rem;color:var(--text2);line-height:1.6;
+}
+
+/* ══════════════════════════════════════
+   ARCHITECTURE / HOW IT WORKS
+══════════════════════════════════════ */
+.howto{
+  padding:5rem 2rem;
+  max-width:800px;margin:0 auto;
+  text-align:center;
+}
+
+.flow{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  margin-top:3rem;
+}
+
+.flow-step{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1rem 2rem;
+  min-width:320px;max-width:420px;width:100%;
+  text-align:center;
+  transition:border-color .2s;
+}
+.flow-step:hover{border-color:var(--gold);}
+
+.flow-step .fs-label{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:.3rem;
+}
+.flow-step .fs-text{
+  font-family:'Amiri',serif;font-size:1.05rem;color:var(--text);
+}
+
+.flow-arrow{
+  color:var(--gold);font-size:1.2rem;opacity:.5;
+  padding:.3rem 0;
+}
+
+.flow-split{
+  display:flex;align-items:flex-start;justify-content:center;
+  gap:1.5rem;width:100%;flex-wrap:wrap;
+  margin:.3rem 0;
+}
+
+/* ══════════════════════════════════════
+   NAV BAR (docs links)
+══════════════════════════════════════ */
+.docs-nav{
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:2.5rem 2rem;
+  text-align:center;
+}
+
+.docs-grid{
+  display:flex;align-items:stretch;justify-content:center;
+  flex-wrap:wrap;gap:1rem;
+  max-width:900px;margin:2rem auto 0;
+}
+
+.doc-card{
+  display:flex;align-items:center;gap:.85rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;padding:1.1rem 1.5rem;
+  text-decoration:none;
+  transition:all .25s;
+  flex:1;min-width:180px;
+}
+.doc-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.doc-card .dc-icon{font-size:1.4rem;flex-shrink:0;}
+.doc-card .dc-text{}
+.doc-card .dc-title{
+  font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:.2rem;
+}
+.doc-card .dc-sub{
+  font-family:'DM Mono',monospace;font-size:.63rem;
+  color:var(--text2);
+}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer{
+  background:var(--void);
+  border-top:1px solid var(--border);
+  padding:3rem 2rem;
+  text-align:center;
+}
+
+.footer-bismillah{
+  font-family:'Amiri',serif;
+  font-size:1.8rem;color:var(--gold);
+  text-shadow:0 0 20px rgba(200,146,42,.25);
+  margin-bottom:1rem;
+}
+.footer-links{
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:1.5rem;
+  margin-bottom:1.5rem;
+}
+.footer-link{
+  font-family:'DM Mono',monospace;font-size:.7rem;
+  letter-spacing:.1em;color:var(--text2);text-decoration:none;
+  transition:color .2s;
+}
+.footer-link:hover{color:var(--gold2);}
+.footer-copy{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  color:var(--muted);letter-spacing:.1em;
+}
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- Animated geometric canvas -->
+<canvas id="geoCanvas"></canvas>
+
+<div class="tile-border"></div>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <div class="hero-ornament">✦ ✦ ✦</div>
+  <div class="hero-name">كلامي</div>
+  <div class="hero-roman">Kalami · My Speech</div>
+  <p class="hero-tagline">
+    Speak <span>Arabic</span>. Hear <span>French</span> & <span>English</span>.<br/>
+    Browser-native. No server. No API key. One file.
+  </p>
+
+  <div class="badges">
+    <span class="badge"><span class="dot"></span>v2.1.0</span>
+    <span class="badge"><span class="dot"></span>Chrome · Edge</span>
+    <span class="badge"><span class="dot"></span>Zero dependencies</span>
+    <span class="badge"><span class="dot"></span>MIT License</span>
+    <span class="badge"><span class="dot"></span>50 tests</span>
+  </div>
+
+  <div class="cta-row">
+    <a href="kalami-v2.1.html" class="btn-primary">🎙️ Launch App</a>
+    <a href="help.html" class="btn-secondary">📖 Help Guide</a>
+    <a href="https://github.com/yourname/kalami" class="btn-secondary" target="_blank">⭐ GitHub</a>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="features">
+  <div class="section-header reveal">
+    <div class="section-label">What Kalami does</div>
+    <div class="section-title">كل ما تحتاجه · Everything You Need</div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="fc-icon">🎙️</span>
+      <div class="fc-title">Arabic Speech Input</div>
+      <div class="fc-desc">Web Speech API with 5 dialect modes — MSA/Gulf, Egyptian, Maghrebi, Levantine, Iraqi. Editable transcript to fix recognition errors.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">🇫🇷🇬🇧</span>
+      <div class="fc-title">Dual Translation</div>
+      <div class="fc-desc">Arabic → French and Arabic → English in parallel via MyMemory free API. Side-by-side panels, newest translation on top.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">⚡</span>
+      <div class="fc-title">Near-Live Mode</div>
+      <div class="fc-desc">Translates and speaks each phrase chunk ~2–3 seconds after you say it. Audio queue engine prevents voice overlap.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">⌨️</span>
+      <div class="fc-title">Arabic Virtual Keyboard</div>
+      <div class="fc-desc">Full 28-letter keyboard with numerals ١–٩, punctuation ، ؟, backspace, word-delete, and a direct Translate key.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">🧠</span>
+      <div class="fc-title">Translation Memory</div>
+      <div class="fc-desc">Repeated phrases translate instantly from in-session cache — no API call, no lag. ⚡ badge confirms cache hit.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">↩️</span>
+      <div class="fc-title">Back-Translation Verify</div>
+      <div class="fc-desc">Translates FR/EN back to Arabic under each entry so you can spot-check accuracy. Toggle on/off per session.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">🔊</span>
+      <div class="fc-title">Voice Playback</div>
+      <div class="fc-desc">Web Speech Synthesis for both languages. Pick any installed voice, adjust speed 0.5× – 2.0×, choose FR / EN / Both.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">📑</span>
+      <div class="fc-title">Export Sessions</div>
+      <div class="fc-desc">Download full bilingual transcripts as .TXT or print-ready PDF with Bismillah header, Arabic and both translations.</div>
+    </div>
+    <div class="feature-card reveal">
+      <span class="fc-icon">⭐</span>
+      <div class="fc-title">Star · Search · Fullscreen</div>
+      <div class="fc-desc">Bookmark important entries, filter history by keyword, expand any panel to fullscreen for meetings or presentations.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ MODES ═══════ -->
+<section style="padding:5rem 2rem;max-width:1000px;margin:0 auto;">
+  <div class="section-header reveal">
+    <div class="section-label">Three ways to listen</div>
+    <div class="section-title">أوضاع الترجمة · Translation Modes</div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card reveal">
+      <span class="mode-glyph">✋</span>
+      <div class="mode-name">Manual</div>
+      <div class="mode-desc">Click to start. Speak your full sentence. Click to stop. Best quality — full context before translation.</div>
+      <span class="mode-lag">Best accuracy</span>
+    </div>
+    <div class="mode-card reveal">
+      <span class="mode-glyph">🔄</span>
+      <div class="mode-name">Continuous</div>
+      <div class="mode-desc">Mic stays open. Auto-translates every time you pause. Great for live conversations hands-free.</div>
+      <span class="mode-lag">Per sentence pause</span>
+    </div>
+    <div class="mode-card reveal">
+      <span class="mode-glyph">⚡</span>
+      <div class="mode-name">Near-Live</div>
+      <div class="mode-desc">Translates each phrase chunk as you speak. As close to simultaneous interpretation as a browser can get.</div>
+      <span class="mode-lag">~2–3 sec lag</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CALLIGRAPHY ═══════ -->
+<section class="calli-section">
+  <div class="section-header reveal">
+    <div class="section-label">من كتاب الله · From the Book of Allah</div>
+    <div class="section-title">Inspiration</div>
+  </div>
+  <div class="calli-grid">
+    <div class="calli-card reveal">
+      <div class="calli-arabic">وَعَلَّمَ آدَمَ الأَسْمَاءَ كُلَّهَا</div>
+      <div class="calli-source">Al-Baqarah 2:31</div>
+      <div class="calli-trans">"And He taught Adam the names of all things"</div>
+    </div>
+    <div class="calli-card reveal">
+      <div class="calli-arabic">إِنَّا أَنزَلْنَاهُ قُرْآنًا عَرَبِيًّا</div>
+      <div class="calli-source">Yusuf 12:2</div>
+      <div class="calli-trans">"Indeed, We have sent it down as an Arabic Qur'an"</div>
+    </div>
+    <div class="calli-card reveal">
+      <div class="calli-arabic">خَيْرُ الكَلَامِ مَا قَلَّ وَدَلَّ</div>
+      <div class="calli-source">Arabic Proverb</div>
+      <div class="calli-trans">"The best speech is that which is brief and to the point"</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ ARCHITECTURE ═══════ -->
+<section class="howto reveal">
+  <div class="section-header">
+    <div class="section-label">Under the hood</div>
+    <div class="section-title">كيف يعمل · How It Works</div>
+  </div>
+  <div class="flow" style="margin-top:3rem;">
+    <div class="flow-step">
+      <div class="fs-label">Your voice</div>
+      <div class="fs-text">🎙️ Arabic Speech</div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="flow-step">
+      <div class="fs-label">Browser API</div>
+      <div class="fs-text">Web Speech Recognition (ar-SA)</div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="flow-step">
+      <div class="fs-label">Editable</div>
+      <div class="fs-text">✏️ Arabic Transcript</div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="flow-split">
+      <div class="flow-step" style="min-width:unset;flex:1;">
+        <div class="fs-label">MyMemory ar→fr</div>
+        <div class="fs-text">🇫🇷 French</div>
+      </div>
+      <div class="flow-step" style="min-width:unset;flex:1;">
+        <div class="fs-label">MyMemory ar→en</div>
+        <div class="fs-text">🇬🇧 English</div>
+      </div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="flow-step">
+      <div class="fs-label">Audio Queue Engine</div>
+      <div class="fs-text">🔊 Web Speech Synthesis</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ DOCS NAV ═══════ -->
+<section class="docs-nav">
+  <div class="section-header reveal">
+    <div class="section-label">Documentation</div>
+    <div class="section-title">الوثائق · Explore the Docs</div>
+  </div>
+  <div class="docs-grid">
+    <a href="kalami-v2.1.html" class="doc-card reveal">
+      <span class="dc-icon">🎙️</span>
+      <div class="dc-text">
+        <div class="dc-title">Launch App</div>
+        <div class="dc-sub">kalami-v2.1.html</div>
+      </div>
+    </a>
+    <a href="help.html" class="doc-card reveal">
+      <span class="dc-icon">📖</span>
+      <div class="dc-text">
+        <div class="dc-title">Help Guide</div>
+        <div class="dc-sub">Step-by-step visual guide</div>
+      </div>
+    </a>
+    <a href="faq.html" class="doc-card reveal">
+      <span class="dc-icon">❓</span>
+      <div class="dc-text">
+        <div class="dc-title">FAQ</div>
+        <div class="dc-sub">18 questions answered</div>
+      </div>
+    </a>
+    <a href="kalami-tests.html" class="doc-card reveal">
+      <span class="dc-icon">🧪</span>
+      <div class="dc-text">
+        <div class="dc-title">Test Suite</div>
+        <div class="dc-sub">50 automated tests</div>
+      </div>
+    </a>
+    <a href="CHANGELOG.md" class="doc-card reveal">
+      <span class="dc-icon">📜</span>
+      <div class="dc-text">
+        <div class="dc-title">Changelog</div>
+        <div class="dc-sub">v1.0 → v2.0 → v2.1</div>
+      </div>
+    </a>
+    <a href="https://github.com/yourname/kalami" class="doc-card reveal" target="_blank">
+      <span class="dc-icon">⭐</span>
+      <div class="dc-text">
+        <div class="dc-title">GitHub</div>
+        <div class="dc-sub">Star · Fork · Contribute</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<div class="tile-border"></div>
+<footer>
+  <div class="footer-bismillah">بارك الله فيكم</div>
+  <div class="footer-links">
+    <a href="kalami-v2.1.html" class="footer-link">App</a>
+    <a href="help.html" class="footer-link">Help</a>
+    <a href="faq.html" class="footer-link">FAQ</a>
+    <a href="kalami-tests.html" class="footer-link">Tests</a>
+    <a href="CHANGELOG.md" class="footer-link">Changelog</a>
+    <a href="LICENSE" class="footer-link">MIT License</a>
+  </div>
+  <div class="footer-copy">كلامي · Kalami v2.1 · Arabic Voice Translator · Zero dependencies · Browser native</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// ANIMATED ISLAMIC GEOMETRIC CANVAS
+// ═══════════════════════════════════════
+const canvas = document.getElementById('geoCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, t = 0;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Draw a single 8-point star
+function drawStar(cx, cy, r, rot, alpha) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#c8922a';
+  ctx.lineWidth = .6;
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const a1 = (i * Math.PI * 2) / 8;
+    const a2 = a1 + Math.PI / 8;
+    const x1 = Math.cos(a1) * r;
+    const y1 = Math.sin(a1) * r;
+    const x2 = Math.cos(a2) * (r * .42);
+    const y2 = Math.sin(a2) * (r * .42);
+    if (i === 0) ctx.moveTo(x1, y1);
+    else ctx.lineTo(x1, y1);
+    ctx.lineTo(x2, y2);
+  }
+  ctx.closePath();
+  ctx.stroke();
+  // Inner circle
+  ctx.beginPath();
+  ctx.arc(0, 0, r * .2, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Draw hexagonal rosette
+function drawRosette(cx, cy, r, alpha) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#1a9f88';
+  ctx.lineWidth = .5;
+  for (let i = 0; i < 6; i++) {
+    const a = (i * Math.PI) / 3;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * r * .5, Math.sin(a) * r * .5, r * .5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.arc(0, 0, r * .5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function frame() {
+  ctx.clearRect(0, 0, W, H);
+  t += .003;
+
+  const cols = Math.ceil(W / 140) + 2;
+  const rows = Math.ceil(H / 140) + 2;
+
+  for (let row = -1; row < rows; row++) {
+    for (let col = -1; col < cols; col++) {
+      const cx = col * 140 + (row % 2) * 70;
+      const cy = row * 120;
+      const phase = (col * 0.3 + row * 0.5 + t) % (Math.PI * 2);
+      const pulse = 0.06 + Math.abs(Math.sin(phase)) * 0.09;
+
+      if ((col + row) % 3 === 0) {
+        drawRosette(cx, cy, 55, pulse * .7);
+      } else {
+        drawStar(cx, cy, 46, t * .08 + col * 0.2, pulse);
+      }
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+frame();
+
+// ═══════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

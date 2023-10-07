@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>كلامي · Help Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold:       #c9922a;
+  --gold-light: #e8b84b;
+  --gold-pale:  #f5d98a;
+  --ink:        #1a120a;
+  --parchment:  #f7f0e3;
+  --warm:       #ede0c8;
+  --tile-green: #2d6b4f;
+  --tile-blue:  #1e4d7a;
+  --tile-red:   #8b2020;
+  --shadow:     rgba(26,18,10,.18);
+  --border:     rgba(201,146,42,.25);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GEOMETRIC BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(60deg, transparent, transparent 30px, rgba(201,146,42,.04) 30px, rgba(201,146,42,.04) 31px),
+    repeating-linear-gradient(-60deg, transparent, transparent 30px, rgba(201,146,42,.04) 30px, rgba(201,146,42,.04) 31px),
+    repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(201,146,42,.03) 30px, rgba(201,146,42,.03) 31px);
+  pointer-events: none; z-index: 0;
+}
+
+body > * { position: relative; z-index: 1; }
+
+/* ── GEOMETRIC SVG HEADER ORNAMENT ── */
+.geo-border {
+  width: 100%;
+  height: 12px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold) 0px, var(--gold) 8px,
+    var(--tile-green) 8px, var(--tile-green) 16px,
+    var(--tile-blue) 16px, var(--tile-blue) 24px,
+    var(--tile-red) 24px, var(--tile-red) 32px
+  );
+  opacity: .85;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, var(--ink) 0%, #2a1a0a 100%);
+  color: var(--parchment);
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Alhambra star pattern overlay */
+header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L35 20 L50 20 L38 29 L42 44 L30 35 L18 44 L22 29 L10 20 L25 20 Z' fill='none' stroke='rgba(201,146,42,0.12)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.header-bismillah {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--gold-light);
+  text-shadow: 0 0 30px rgba(232,184,75,.3), 0 2px 4px rgba(0,0,0,.6);
+  letter-spacing: .05em;
+  margin-bottom: 1rem;
+  animation: fadeIn 1s ease;
+}
+
+.header-ornament {
+  color: var(--gold);
+  font-size: 1.2rem;
+  letter-spacing: .3em;
+  margin-bottom: .8rem;
+  opacity: .7;
+}
+
+.header-title {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: var(--gold-pale);
+  margin-bottom: .4rem;
+}
+
+.header-subtitle {
+  font-size: .85rem;
+  color: rgba(245,217,138,.6);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── NAV ── */
+nav {
+  background: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding: .6rem 2rem;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.5rem; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100;
+}
+
+.nav-link {
+  color: var(--gold-light);
+  text-decoration: none;
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .3rem .7rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all .2s;
+}
+.nav-link:hover { border-color: var(--gold); background: rgba(201,146,42,.1); }
+.nav-link.active { border-color: var(--gold); color: var(--gold-pale); }
+
+/* ── MAIN ── */
+main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+/* ── SECTION TITLE ── */
+.section {
+  margin-bottom: 3rem;
+  animation: fadeUp .5s ease both;
+}
+
+.section-title {
+  display: flex; align-items: center; gap: .75rem;
+  font-family: 'Amiri', serif;
+  font-size: 1.7rem;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  padding-bottom: .7rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  width: 38px; height: 38px;
+  background: var(--ink);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ── STEP CARDS ── */
+.steps { display: flex; flex-direction: column; gap: .85rem; }
+
+.step {
+  display: flex; gap: 1.1rem; align-items: flex-start;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: transform .2s, box-shadow .2s;
+}
+.step:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+
+.step-num {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Amiri', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(201,146,42,.35);
+}
+
+.step-content h4 { font-size: 1rem; font-weight: 600; color: var(--ink); margin-bottom: .25rem; }
+.step-content p { font-size: .9rem; color: #5a4030; line-height: 1.6; }
+.step-content code {
+  font-family: 'DM Mono', monospace; font-size: .78rem;
+  background: var(--warm); border: 1px solid var(--border);
+  border-radius: 4px; padding: .1rem .4rem; color: var(--tile-green);
+}
+
+/* ── FEATURE GRID ── */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+
+.feature-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.15rem;
+  box-shadow: 0 2px 10px var(--shadow);
+  transition: transform .2s;
+}
+.feature-card:hover { transform: translateY(-3px); }
+
+.feature-card .fc-icon { font-size: 1.5rem; margin-bottom: .5rem; }
+.feature-card h4 { font-size: .95rem; font-weight: 600; color: var(--ink); margin-bottom: .3rem; }
+.feature-card p { font-size: .82rem; color: #6a5040; line-height: 1.55; }
+
+/* ── MODES COMPARISON ── */
+.modes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.modes-table th {
+  background: var(--ink); color: var(--gold-light);
+  font-family: 'Amiri', serif; font-size: 1rem;
+  padding: .8rem 1rem; text-align: left;
+}
+.modes-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--warm); color: #4a3020; }
+.modes-table tr:last-child td { border-bottom: none; }
+.modes-table tr:hover td { background: #fdf8f0; }
+.badge {
+  display: inline-block; padding: .15rem .5rem; border-radius: 20px;
+  font-size: .72rem; font-weight: 600; letter-spacing: .05em;
+}
+.badge.good { background: rgba(45,107,79,.1); color: var(--tile-green); border: 1px solid rgba(45,107,79,.3); }
+.badge.warn { background: rgba(139,32,32,.08); color: var(--tile-red); border: 1px solid rgba(139,32,32,.2); }
+
+/* ── SHORTCUT TABLE ── */
+.shortcut-grid { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1.5rem; align-items: center; }
+.sc-key {
+  font-family: 'DM Mono', monospace; font-size: .78rem;
+  background: var(--ink); color: var(--gold-light);
+  border-radius: 6px; padding: .25rem .65rem;
+  text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,.3);
+  white-space: nowrap;
+}
+.sc-desc { font-size: .9rem; color: #5a4030; }
+
+/* ── TIP BOX ── */
+.tip-box {
+  background: linear-gradient(135deg, rgba(45,107,79,.08), rgba(30,77,122,.08));
+  border: 1px solid rgba(45,107,79,.25);
+  border-left: 4px solid var(--tile-green);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+  font-size: .88rem;
+  color: #2a4a30;
+  line-height: 1.65;
+}
+.tip-box strong { color: var(--tile-green); }
+
+/* ── ALHAMBRA DIVIDER ── */
+.alhambra-divider {
+  text-align: center;
+  margin: 2rem 0;
+  color: var(--gold);
+  font-size: 1.3rem;
+  letter-spacing: .5em;
+  opacity: .5;
+}
+
+/* ── CALLIGRAPHY QUOTE ── */
+.calligraphy-quote {
+  text-align: center;
+  background: linear-gradient(135deg, var(--ink), #2a1a0a);
+  color: var(--gold-pale);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 4px 24px var(--shadow);
+}
+.calligraphy-quote .arabic-text {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: var(--gold-light);
+  direction: rtl;
+  line-height: 2;
+  margin-bottom: .75rem;
+}
+.calligraphy-quote .translation {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: rgba(245,217,138,.7);
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: var(--ink);
+  color: var(--gold);
+  font-family: 'Amiri', serif;
+  font-size: 1rem;
+  letter-spacing: .1em;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<div class="geo-border"></div>
+
+<header>
+  <div class="header-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <div class="header-ornament">✦ ✦ ✦</div>
+  <div class="header-title">كلامي · Kalami — Help Guide</div>
+  <div class="header-subtitle">Arabic Voice Translator · v2.1</div>
+</header>
+
+<div class="geo-border"></div>
+
+<nav>
+  <a href="#quickstart" class="nav-link active">Quick Start</a>
+  <a href="#modes" class="nav-link">Modes</a>
+  <a href="#features" class="nav-link">Features</a>
+  <a href="#keyboard" class="nav-link">Keyboard</a>
+  <a href="#shortcuts" class="nav-link">Shortcuts</a>
+  <a href="faq.html" class="nav-link">FAQ →</a>
+</nav>
+
+<main>
+
+  <!-- CALLIGRAPHY OPENING QUOTE -->
+  <div class="calligraphy-quote" style="animation:fadeIn 1s ease both .3s;">
+    <div class="arabic-text">وَعَلَّمَ آدَمَ الأَسْمَاءَ كُلَّهَا</div>
+    <div class="translation">"And He taught Adam the names of all things" — Al-Baqarah 2:31</div>
+  </div>
+
+  <!-- QUICK START -->
+  <div class="section" id="quickstart" style="animation-delay:.1s">
+    <div class="section-title">
+      <div class="section-icon">🚀</div>
+      Quick Start — 3 Steps
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">١</div>
+        <div class="step-content">
+          <h4>Open in Chrome or Edge</h4>
+          <p>Open <code>kalami-v2.1.html</code> directly in Google Chrome or Microsoft Edge. Safari and Firefox are <strong>not supported</strong> — they lack the Web Speech Recognition API.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٢</div>
+        <div class="step-content">
+          <h4>Allow Microphone Access</h4>
+          <p>When prompted, click <strong>Allow</strong> to grant microphone permission. This is required for Arabic speech recognition. Kalami never records or stores your voice.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٣</div>
+        <div class="step-content">
+          <h4>Click the Microphone & Speak Arabic</h4>
+          <p>Click the 🎙️ button or press <code>Space</code>. Speak naturally in Arabic. Your words appear as text, then translate to French 🇫🇷 and English 🇬🇧 automatically.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box">
+      <strong>💡 Best results:</strong> Speak at a natural pace in a quiet environment. Use the dialect selector to match your Arabic dialect (MSA, Egyptian, Maghrebi, Levantine, or Iraqi) for better recognition accuracy.
+    </div>
+  </div>
+
+  <div class="alhambra-divider">❖ ❖ ❖</div>
+
+  <!-- MODES -->
+  <div class="section" id="modes" style="animation-delay:.2s">
+    <div class="section-title">
+      <div class="section-icon">🔄</div>
+      Translation Modes
+    </div>
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>How to Use</th>
+          <th>Best For</th>
+          <th>Translation Lag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>✋ Manual</strong></td>
+          <td>Click mic → speak → click again to stop</td>
+          <td>Single sentences, quiet environment</td>
+          <td><span class="badge good">Best quality</span></td>
+        </tr>
+        <tr>
+          <td><strong>🔄 Continuous</strong></td>
+          <td>Toggle switch ON → mic stays open forever</td>
+          <td>Live conversations, hands-free</td>
+          <td><span class="badge good">Per pause</span></td>
+        </tr>
+        <tr>
+          <td><strong>⚡ Near-Live</strong></td>
+          <td>Enable Near-Live toggle → translates each phrase chunk</td>
+          <td>Live interpretation, lectures</td>
+          <td><span class="badge warn">~2–3 seconds</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip-box">
+      <strong>⚡ Near-Live tip:</strong> Combine Near-Live with a single speak language (FR or EN, not Both) for the fastest response. The audio queue ensures voice output never overlaps.
+    </div>
+  </div>
+
+  <div class="alhambra-divider">❖ ❖ ❖</div>
+
+  <!-- FEATURES -->
+  <div class="section" id="features" style="animation-delay:.3s">
+    <div class="section-title">
+      <div class="section-icon">✨</div>
+      All Features
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="fc-icon">🏷️</div>
+        <h4>Dialect Selector</h4>
+        <p>Choose MSA/Gulf, Egyptian, Maghrebi, Levantine, or Iraqi dialect. Matching your dialect significantly improves recognition accuracy.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">✏️</div>
+        <h4>Edit Transcript</h4>
+        <p>Click directly on the Arabic transcript box to correct any recognition errors before translating. Fully editable, RTL-aware.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">⚡</div>
+        <h4>Translation Memory</h4>
+        <p>Phrases you've already translated are cached in-session. Repeating the same phrase gives an instant result with a ⚡ badge.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">↩️</div>
+        <h4>Back-Translation Verify</h4>
+        <p>Enable "↩ Verify" to translate FR/EN back to Arabic under each entry. Spot-check translation accuracy instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🔊</div>
+        <h4>Voice Selector</h4>
+        <p>Your browser may have multiple FR and EN voices installed. Pick the one you prefer from the dropdown in each language panel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🎚️</div>
+        <h4>Speech Rate</h4>
+        <p>Slow down to 0.5× for learners or speed up to 2× for native listeners. Controlled independently per language.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">⭐</div>
+        <h4>Star Entries</h4>
+        <p>Click the ☆ star on any translation card to bookmark it. Starred entries are highlighted in gold and persist through searches.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🔍</div>
+        <h4>Search History</h4>
+        <p>Type in the search box above each panel to filter translations by keyword. Useful for long sessions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🖥️</div>
+        <h4>Fullscreen Mode</h4>
+        <p>Click ⛶ on any panel to expand it to fullscreen — ideal for presentations or showing translations to a group.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📑</div>
+        <h4>Export PDF</h4>
+        <p>Exports a bilingual PDF with Arabic, French, and English for each entry. Opens the print dialog — save as PDF.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🔡</div>
+        <h4>Font Size Slider</h4>
+        <p>Adjust text size across all panels with the Aa slider in the controls bar. Great for accessibility or presentations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">⌨️</div>
+        <h4>Arabic Keyboard</h4>
+        <p>Full on-screen Arabic keyboard with all 28 letters, numerals ١-٩, punctuation, and a direct translate button.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alhambra-divider">❖ ❖ ❖</div>
+
+  <!-- ARABIC KEYBOARD -->
+  <div class="section" id="keyboard" style="animation-delay:.35s">
+    <div class="section-title">
+      <div class="section-icon">⌨️</div>
+      Arabic Virtual Keyboard
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">١</div>
+        <div class="step-content">
+          <h4>Open the Keyboard</h4>
+          <p>Click the <code>⌨️ Arabic Keyboard</code> button in the input panel, or press <code>K</code> on your keyboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٢</div>
+        <div class="step-content">
+          <h4>Type Arabic Letters</h4>
+          <p>Click any letter to insert it at the cursor position in the transcript box. Use <code>⌫ Del</code> to delete the last character, <code>⌦ Word</code> to delete the last word, and <code>مسافة</code> for a space.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٣</div>
+        <div class="step-content">
+          <h4>Translate Directly</h4>
+          <p>Click the golden <code>⚡ Translate</code> key on the keyboard row — no need to reach for the button above.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> The keyboard is perfect for correcting speech recognition errors. Just click the wrong letter, use backspace, and retype it. Then hit ⚡ Translate right from the keyboard.
+    </div>
+  </div>
+
+  <div class="alhambra-divider">❖ ❖ ❖</div>
+
+  <!-- SHORTCUTS -->
+  <div class="section" id="shortcuts" style="animation-delay:.4s">
+    <div class="section-title">
+      <div class="section-icon">⌨️</div>
+      Keyboard Shortcuts
+    </div>
+    <div style="background:white;border:1px solid var(--border);border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px var(--shadow);">
+      <div class="shortcut-grid">
+        <span class="sc-key">Space</span><span class="sc-desc">Start / Stop microphone</span>
+        <span class="sc-key">T</span><span class="sc-desc">Translate current transcript</span>
+        <span class="sc-key">C</span><span class="sc-desc">Clear all history</span>
+        <span class="sc-key">E</span><span class="sc-desc">Export session as TXT</span>
+        <span class="sc-key">K</span><span class="sc-desc">Toggle Arabic keyboard</span>
+        <span class="sc-key">F</span><span class="sc-desc">Fullscreen French panel</span>
+        <span class="sc-key">G</span><span class="sc-desc">Fullscreen English panel</span>
+        <span class="sc-key">Esc</span><span class="sc-desc">Close fullscreen / cancel</span>
+      </div>
+    </div>
+    <div class="tip-box">
+      <strong>⚠️ Note:</strong> Shortcuts are disabled when focus is inside a text input or the Arabic transcript box, to avoid interference with typing.
+    </div>
+  </div>
+
+  <!-- CLOSING CALLIGRAPHY -->
+  <div class="calligraphy-quote">
+    <div class="arabic-text">إِنَّا أَنزَلْنَاهُ قُرْآنًا عَرَبِيًّا لَّعَلَّكُمْ تَعْقِلُونَ</div>
+    <div class="translation">"Indeed, We have sent it down as an Arabic Qur'an so that you may understand" — Yusuf 12:2</div>
+  </div>
+
+</main>
+
+<div class="geo-border"></div>
+<footer>كلامي · Kalami v2.1 · Arabic Voice Translator · بارك الله فيكم</footer>
+
+<script>
+// Active nav on scroll
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+  navLinks.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === `#${current}`);
+  });
+});
+</script>
+</body>
+</html>

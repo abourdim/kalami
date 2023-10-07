@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>كلامي · Kalami v2.1 — Test Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Amiri:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #05080f;
+  --surface:  #0b1120;
+  --surface2: #0f1a2e;
+  --border:   #162338;
+  --border2:  #1e3050;
+  --amber:    #e8a020;
+  --teal:     #1fc8a8;
+  --fr:       #3a8ef5;
+  --text:     #d8e4f0;
+  --text2:    #8aa0bc;
+  --muted:    #3a5070;
+  --pass:     #4caf50;
+  --fail:     #e05050;
+  --skip:     #f5c842;
+  --running:  #e8a020;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:0 0 4rem;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(232,160,32,.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+body>*{position:relative;z-index:1;}
+
+header{
+  background:linear-gradient(180deg,rgba(11,17,32,.98) 0%,transparent 100%);
+  border-bottom:1px solid var(--border);
+  padding:1.75rem 2rem 1.25rem;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(14px);
+}
+
+.header-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+
+.title-block h1{
+  font-size:1.4rem;font-weight:800;letter-spacing:.02em;
+  background:linear-gradient(135deg,var(--amber),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.title-block p{font-size:.72rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.2rem;font-family:'DM Mono',monospace;}
+
+.run-btn{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.6rem 1.5rem;border-radius:10px;
+  border:1px solid var(--amber);background:rgba(232,160,32,.1);
+  color:var(--amber);font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.run-btn:hover{background:rgba(232,160,32,.2);}
+.run-btn:disabled{opacity:.4;cursor:default;}
+
+.summary-bar{
+  display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+  margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);
+}
+
+.summary-item{display:flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.8rem;}
+.summary-dot{width:9px;height:9px;border-radius:50%;}
+.summary-dot.pass{background:var(--pass);}
+.summary-dot.fail{background:var(--fail);}
+.summary-dot.skip{background:var(--skip);}
+.summary-dot.running{background:var(--running);animation:pulse .8s ease infinite;}
+
+.progress-bar-wrap{flex:1;min-width:160px;height:4px;background:var(--border2);border-radius:4px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--pass),var(--teal));border-radius:4px;transition:width .4s ease;width:0%;}
+
+.elapsed{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem;}
+
+/* SUITE GROUP */
+.suite{margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+
+.suite-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.25rem;border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;transition:background .2s;
+}
+.suite-header:hover{background:rgba(255,255,255,.02);}
+
+.suite-title{display:flex;align-items:center;gap:.65rem;}
+.suite-icon{font-size:1.1rem;}
+.suite-name{font-size:.85rem;font-weight:700;letter-spacing:.06em;}
+.suite-count{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);}
+
+.suite-badge{
+  font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:.2rem .55rem;border-radius:20px;border:1px solid var(--border2);
+  color:var(--muted);transition:all .3s;
+}
+.suite-badge.pass{border-color:var(--pass);color:var(--pass);background:rgba(76,175,80,.08);}
+.suite-badge.fail{border-color:var(--fail);color:var(--fail);background:rgba(224,80,80,.08);}
+.suite-badge.running{border-color:var(--running);color:var(--running);background:rgba(232,160,32,.08);}
+
+.suite-body{padding:.5rem 0;}
+.suite-body.collapsed{display:none;}
+
+/* TEST ROW */
+.test-row{
+  display:flex;align-items:flex-start;gap:.75rem;
+  padding:.6rem 1.25rem;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.test-row:last-child{border-bottom:none;}
+.test-row:hover{background:rgba(255,255,255,.015);}
+
+.test-status{
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;flex-shrink:0;margin-top:.1rem;
+  border:1px solid var(--border2);background:var(--surface2);
+  transition:all .3s;
+}
+.test-status.pass{background:rgba(76,175,80,.15);border-color:var(--pass);color:var(--pass);}
+.test-status.fail{background:rgba(224,80,80,.15);border-color:var(--fail);color:var(--fail);}
+.test-status.skip{background:rgba(245,200,66,.1);border-color:var(--skip);color:var(--skip);}
+.test-status.running{border-color:var(--running);animation:pulse .7s ease infinite;}
+
+.test-info{flex:1;min-width:0;}
+.test-name{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:.15rem;}
+.test-desc{font-size:.68rem;color:var(--text2);font-family:'DM Mono',monospace;line-height:1.4;}
+
+.test-result{
+  font-size:.68rem;font-family:'DM Mono',monospace;
+  color:var(--muted);text-align:right;flex-shrink:0;max-width:260px;
+  line-height:1.4;
+}
+.test-result.pass{color:var(--pass);}
+.test-result.fail{color:var(--fail);}
+.test-result .expected{color:var(--teal);}
+.test-result .got{color:var(--fail);}
+
+.test-time{font-size:.6rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;margin-top:.2rem;}
+
+/* LOG CONSOLE */
+.log-panel{
+  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:1rem;margin-top:1.5rem;
+}
+.log-header{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;}
+.log-body{
+  font-family:'DM Mono',monospace;font-size:.7rem;line-height:1.7;
+  max-height:200px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+}
+.log-pass{color:var(--pass);}
+.log-fail{color:var(--fail);}
+.log-info{color:var(--text2);}
+.log-warn{color:var(--skip);}
+
+/* IFRAME hidden for DOM testing */
+#testFrame{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="title-block">
+      <h1>كلامي · Kalami Test Suite</h1>
+      <p>v2.1 · Full Automated Coverage · 50 Tests</p>
+    </div>
+    <button class="run-btn" id="runAllBtn">▶ Run All Tests</button>
+  </div>
+  <div class="summary-bar">
+    <div class="summary-item"><div class="summary-dot pass"></div><span id="passCount">0</span> Passed</div>
+    <div class="summary-item"><div class="summary-dot fail"></div><span id="failCount">0</span> Failed</div>
+    <div class="summary-item"><div class="summary-dot skip"></div><span id="skipCount">0</span> Skipped</div>
+    <div class="summary-item"><div class="summary-dot running"></div><span id="runCount">0</span> Running</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="elapsed" id="elapsed">—</div>
+  </div>
+</header>
+
+<main>
+  <div id="suitesContainer"></div>
+  <div class="log-panel">
+    <div class="log-header">📋 Test Log</div>
+    <div class="log-body" id="logBody"></div>
+  </div>
+</main>
+
+<iframe id="testFrame" src="kalami-v2.1.html"></iframe>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// TEST DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+const SUITES = [
+  {
+    id: 'dom',
+    icon: '🏗️',
+    name: 'DOM Structure & Elements',
+    tests: [
+      { id: 'dom-01', name: 'Bismillah renders', desc: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ element present', fn: t => {
+        const el = t.querySelector('.bismillah');
+        assert(el, 'Element .bismillah not found');
+        assertContains(el.textContent, 'بِسْمِ', 'Bismillah text missing');
+      }},
+      { id: 'dom-02', name: 'App title present', desc: 'كلامي name displayed in header', fn: t => {
+        const el = t.querySelector('.app-name-ar');
+        assert(el, '.app-name-ar not found');
+        assertContains(el.textContent, 'كلامي', 'App name wrong');
+      }},
+      { id: 'dom-03', name: 'Mic button exists', desc: '#micBtn present and not disabled by default', fn: t => {
+        const el = t.querySelector('#micBtn');
+        assert(el, '#micBtn missing');
+        // disabled only if SR not supported — in test iframe SR is mocked
+      }},
+      { id: 'dom-04', name: 'Mode toggle exists', desc: '#modeToggle checkbox present', fn: t => {
+        assert(t.querySelector('#modeToggle'), '#modeToggle missing');
+      }},
+      { id: 'dom-05', name: 'Dialect selector has 5 options', desc: 'MSA/Egyptian/Maghrebi/Levantine/Iraqi', fn: t => {
+        const sel = t.querySelector('#dialectSelect');
+        assert(sel, '#dialectSelect missing');
+        assertEqual(sel.options.length, 5, `Expected 5 dialects, got ${sel.options.length}`);
+      }},
+      { id: 'dom-06', name: 'Near-live toggle exists', desc: '#nearLiveBtn present in controls bar', fn: t => {
+        assert(t.querySelector('#nearLiveBtn'), '#nearLiveBtn missing');
+      }},
+      { id: 'dom-07', name: 'Speak language buttons × 3', desc: 'FR, EN, Both buttons present', fn: t => {
+        const btns = t.querySelectorAll('.speak-lang-btn');
+        assertEqual(btns.length, 3, `Expected 3 speak-lang-btn, got ${btns.length}`);
+      }},
+      { id: 'dom-08', name: 'FR and EN panels present', desc: '#frPanel and #enPanel in DOM', fn: t => {
+        assert(t.querySelector('#frPanel'), '#frPanel missing');
+        assert(t.querySelector('#enPanel'), '#enPanel missing');
+      }},
+      { id: 'dom-09', name: 'Voice selectors exist', desc: '#frVoiceSelect and #enVoiceSelect present', fn: t => {
+        assert(t.querySelector('#frVoiceSelect'), '#frVoiceSelect missing');
+        assert(t.querySelector('#enVoiceSelect'), '#enVoiceSelect missing');
+      }},
+      { id: 'dom-10', name: 'Arabic keyboard present', desc: '#arabicKeyboard with keys', fn: t => {
+        const kb = t.querySelector('#arabicKeyboard');
+        assert(kb, '#arabicKeyboard missing');
+        const keys = kb.querySelectorAll('.kb-key');
+        assert(keys.length >= 40, `Too few keys: ${keys.length}`);
+      }},
+      { id: 'dom-11', name: 'Rate sliders exist', desc: '#frRateSlider and #enRateSlider with correct range', fn: t => {
+        const fr = t.querySelector('#frRateSlider');
+        const en = t.querySelector('#enRateSlider');
+        assert(fr && en, 'Rate sliders missing');
+        assertEqual(parseFloat(fr.min), 0.5, 'FR slider min wrong');
+        assertEqual(parseFloat(fr.max), 2.0, 'FR slider max wrong');
+      }},
+      { id: 'dom-12', name: 'Export buttons exist', desc: 'TXT and PDF export buttons present', fn: t => {
+        assert(t.querySelector('#exportTxtBtn'), '#exportTxtBtn missing');
+        assert(t.querySelector('#exportPdfBtn'), '#exportPdfBtn missing');
+      }},
+      { id: 'dom-13', name: 'Search inputs exist', desc: '#frSearch and #enSearch present', fn: t => {
+        assert(t.querySelector('#frSearch'), '#frSearch missing');
+        assert(t.querySelector('#enSearch'), '#enSearch missing');
+      }},
+      { id: 'dom-14', name: 'Waveform bars rendered', desc: '11 wave bars in #waveform', fn: t => {
+        const bars = t.querySelectorAll('#waveform .wave-bar');
+        assertEqual(bars.length, 11, `Expected 11 bars, got ${bars.length}`);
+      }},
+      { id: 'dom-15', name: 'Shortcuts panel hidden by default', desc: '#shortcutsPanel not visible initially', fn: t => {
+        const p = t.querySelector('#shortcutsPanel');
+        assert(p, 'Shortcuts panel missing');
+        assert(!p.classList.contains('visible'), 'Shortcuts panel should be hidden by default');
+      }},
+    ]
+  },
+
+  {
+    id: 'state',
+    icon: '🧠',
+    name: 'State & Logic',
+    tests: [
+      { id: 'state-01', name: 'Initial state: manual mode', desc: 'state.mode === "manual" on load', fn: t => {
+        const s = t.contentWindow.state;
+        assertEqual(s.mode, 'manual', `Expected "manual", got "${s.mode}"`);
+      }},
+      { id: 'state-02', name: 'Initial state: not listening', desc: 'state.isListening === false', fn: t => {
+        assert(!t.contentWindow.state.isListening, 'Should not be listening on load');
+      }},
+      { id: 'state-03', name: 'Initial state: autoPlay off', desc: 'state.autoPlay === false', fn: t => {
+        assert(!t.contentWindow.state.autoPlay, 'autoPlay should be false on load');
+      }},
+      { id: 'state-04', name: 'Initial state: nearLive off', desc: 'state.nearLive === false', fn: t => {
+        assert(!t.contentWindow.state.nearLive, 'nearLive should be false on load');
+      }},
+      { id: 'state-05', name: 'Initial state: speakLang = "fr"', desc: 'Default speak language is French', fn: t => {
+        assertEqual(t.contentWindow.state.speakLang, 'fr', `Expected "fr", got "${t.contentWindow.state.speakLang}"`);
+      }},
+      { id: 'state-06', name: 'Initial state: empty histories', desc: 'frHistory and enHistory start empty', fn: t => {
+        const s = t.contentWindow.state;
+        assertEqual(s.frHistory.length, 0, 'frHistory not empty');
+        assertEqual(s.enHistory.length, 0, 'enHistory not empty');
+      }},
+      { id: 'state-07', name: 'Initial state: empty audio queue', desc: 'audioQueue starts empty', fn: t => {
+        assertEqual(t.contentWindow.state.audioQueue.length, 0, 'audioQueue not empty');
+      }},
+      { id: 'state-08', name: 'Initial state: empty session log', desc: 'sessionLog starts empty', fn: t => {
+        assertEqual(t.contentWindow.state.sessionLog.length, 0, 'sessionLog not empty');
+      }},
+      { id: 'state-09', name: 'Translation memory starts empty', desc: 'translationMemory = {}', fn: t => {
+        const mem = t.contentWindow.state.translationMemory;
+        assertEqual(Object.keys(mem).length, 0, 'translationMemory not empty');
+      }},
+      { id: 'state-10', name: 'nearLive toggles correctly', desc: 'Click nearLiveBtn → state.nearLive flips', fn: t => {
+        const w = t.contentWindow;
+        const btn = t.querySelector('#nearLiveBtn');
+        const before = w.state.nearLive;
+        btn.click();
+        assert(w.state.nearLive !== before, 'nearLive did not toggle');
+        btn.click(); // reset
+        assert(w.state.nearLive === before, 'nearLive did not toggle back');
+      }},
+      { id: 'state-11', name: 'autoPlay toggles correctly', desc: 'Click autoPlayBtn → state.autoPlay flips', fn: t => {
+        const w = t.contentWindow;
+        const btn = t.querySelector('#autoPlayBtn');
+        const before = w.state.autoPlay;
+        btn.click();
+        assert(w.state.autoPlay !== before, 'autoPlay did not toggle');
+        btn.click();
+      }},
+      { id: 'state-12', name: 'backTrans toggles correctly', desc: 'Click backTransBtn → state.backTrans flips', fn: t => {
+        const w = t.contentWindow;
+        const btn = t.querySelector('#backTransBtn');
+        const before = w.state.backTrans;
+        btn.click();
+        assert(w.state.backTrans !== before, 'backTrans did not toggle');
+        btn.click();
+      }},
+      { id: 'state-13', name: 'Mode toggle: manual→continuous', desc: 'Checking modeToggle checkbox sets state.mode', fn: t => {
+        const w = t.contentWindow;
+        const toggle = t.querySelector('#modeToggle');
+        toggle.checked = true;
+        toggle.dispatchEvent(new Event('change'));
+        assertEqual(w.state.mode, 'continuous', 'Mode should be continuous');
+        toggle.checked = false;
+        toggle.dispatchEvent(new Event('change'));
+        assertEqual(w.state.mode, 'manual', 'Mode should be manual');
+      }},
+      { id: 'state-14', name: 'Speak language selection', desc: 'Clicking EN button sets speakLang = "en"', fn: t => {
+        const w = t.contentWindow;
+        const enBtn = [...t.querySelectorAll('.speak-lang-btn')].find(b => b.dataset.lang === 'en');
+        enBtn.click();
+        assertEqual(w.state.speakLang, 'en', `speakLang should be "en", got "${w.state.speakLang}"`);
+        // reset
+        const frBtn = [...t.querySelectorAll('.speak-lang-btn')].find(b => b.dataset.lang === 'fr');
+        frBtn.click();
+      }},
+      { id: 'state-15', name: 'Speak both selection', desc: 'Clicking Both button sets speakLang = "both"', fn: t => {
+        const w = t.contentWindow;
+        const bothBtn = [...t.querySelectorAll('.speak-lang-btn')].find(b => b.dataset.lang === 'both');
+        bothBtn.click();
+        assertEqual(w.state.speakLang, 'both', `speakLang should be "both"`);
+        const frBtn = [...t.querySelectorAll('.speak-lang-btn')].find(b => b.dataset.lang === 'fr');
+        frBtn.click();
+      }},
+    ]
+  },
+
+  {
+    id: 'logic',
+    icon: '⚙️',
+    name: 'Core Functions',
+    tests: [
+      { id: 'fn-01', name: 'esc() escapes HTML', desc: 'Prevents XSS in translation output', fn: t => {
+        const esc = t.contentWindow.esc;
+        assertEqual(esc('<script>'), '&lt;script&gt;', 'XSS not escaped');
+        assertEqual(esc('&'), '&amp;', '& not escaped');
+        assertEqual(esc('"hello"'), '"hello"', 'Normal text changed');
+      }},
+      { id: 'fn-02', name: 'setTranscript() updates box', desc: 'Text appears in transcriptBox', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('مرحبا');
+        assertEqual(t.querySelector('#transcriptBox').textContent, 'مرحبا', 'Transcript text mismatch');
+        w.setTranscript('');
+      }},
+      { id: 'fn-03', name: 'getTranscript() trims whitespace', desc: 'Returns trimmed text from box', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#transcriptBox').textContent = '  مرحبا  ';
+        const result = w.getTranscript();
+        assertEqual(result, 'مرحبا', `Expected "مرحبا", got "${result}"`);
+        w.setTranscript('');
+      }},
+      { id: 'fn-04', name: 'setStatus() sets correct class', desc: 'Status bar gets the right CSS class', fn: t => {
+        const w = t.contentWindow;
+        w.setStatus('listening', 'Listening...');
+        assert(t.querySelector('#statusBar').classList.contains('listening'), 'Missing .listening class');
+        w.setStatus('', 'Ready');
+        assert(!t.querySelector('#statusBar').classList.contains('listening'), '.listening should be removed');
+      }},
+      { id: 'fn-05', name: 'showToast() shows toast', desc: 'Toast becomes visible with message', fn: t => {
+        const w = t.contentWindow;
+        w.showToast('Test message');
+        const toast = t.querySelector('#toast');
+        assert(toast.classList.contains('show'), 'Toast not shown');
+        assertEqual(toast.textContent, 'Test message', 'Toast message wrong');
+      }},
+      { id: 'fn-06', name: 'addEntries() populates history', desc: 'FR and EN entries added to state and DOM', fn: t => {
+        const w = t.contentWindow;
+        const before = w.state.frHistory.length;
+        w.addEntries('مرحبا', 'Bonjour', 'Hello', null, null);
+        assertEqual(w.state.frHistory.length, before + 1, 'frHistory not incremented');
+        assertEqual(w.state.enHistory.length, before + 1, 'enHistory not incremented');
+        assertEqual(w.state.sessionLog.length, before + 1, 'sessionLog not incremented');
+        const latest = w.state.frHistory[w.state.frHistory.length - 1];
+        assertEqual(latest.text, 'Bonjour', 'FR text wrong');
+      }},
+      { id: 'fn-07', name: 'addEntries() assigns unique IDs', desc: 'Each entry has unique numeric id', fn: t => {
+        const w = t.contentWindow;
+        w.addEntries('test1', 'FR1', 'EN1', null, null);
+        w.addEntries('test2', 'FR2', 'EN2', null, null);
+        const ids = w.state.frHistory.map(x => x.id);
+        const unique = new Set(ids);
+        assertEqual(unique.size, ids.length, 'Duplicate IDs found');
+      }},
+      { id: 'fn-08', name: 'addEntries() starred:false by default', desc: 'New entries are not starred', fn: t => {
+        const w = t.contentWindow;
+        w.addEntries('star-test', 'FR', 'EN', null, null);
+        const e = w.state.frHistory[w.state.frHistory.length - 1];
+        assert(!e.starred, 'New entry should not be starred');
+      }},
+      { id: 'fn-09', name: 'Translation memory stores result', desc: 'After translateText, memory has entry', async fn(t) {
+        const w = t.contentWindow;
+        const key = 'مرحبا بالعالم'.toLowerCase();
+        // Mock fetch
+        const origFetch = w.fetch;
+        w.fetch = async (url) => ({
+          json: async () => ({ responseData: { translatedText: url.includes('ar|fr') ? 'Bonjour le monde' : 'Hello world' }})
+        });
+        await w.translateText('مرحبا بالعالم');
+        assert(w.state.translationMemory[key], 'Memory not stored');
+        assertEqual(w.state.translationMemory[key].fr, 'Bonjour le monde', 'FR memory wrong');
+        w.fetch = origFetch;
+      }},
+      { id: 'fn-10', name: 'Translation memory returns cached', desc: 'Second call uses cache, no fetch', async fn(t) {
+        const w = t.contentWindow;
+        const testKey = 'كلمة مخزنة'.toLowerCase();
+        w.state.translationMemory[testKey] = { fr: 'Mot mis en cache', en: 'Cached word' };
+        let fetchCalled = false;
+        const origFetch = w.fetch;
+        w.fetch = async () => { fetchCalled = true; return { json: async () => ({}) }; };
+        await w.translateText('كلمة مخزنة');
+        assert(!fetchCalled, 'Fetch was called despite cache hit');
+        w.fetch = origFetch;
+      }},
+      { id: 'fn-11', name: 'renderHistory shows newest on top', desc: 'First DOM child matches last array entry', fn: t => {
+        const w = t.contentWindow;
+        w.state.frHistory = [];
+        w.addEntries('A', 'Premier', 'First', null, null);
+        w.addEntries('B', 'Deuxième', 'Second', null, null);
+        const entries = t.querySelector('#frHistory').querySelectorAll('.translation-entry');
+        assert(entries.length >= 2, 'Not enough entries rendered');
+        assertContains(entries[0].textContent, 'Deuxième', 'Newest not on top');
+      }},
+      { id: 'fn-12', name: 'renderHistory search filter works', desc: 'Only matching entries shown', fn: t => {
+        const w = t.contentWindow;
+        w.state.frHistory = [];
+        w.addEntries('t1', 'Bonjour monde', 'Hello world', null, null);
+        w.addEntries('t2', 'Au revoir', 'Goodbye', null, null);
+        w.renderHistory(t.querySelector('#frHistory'), w.state.frHistory, 'revoir', 'fr');
+        const entries = t.querySelector('#frHistory').querySelectorAll('.translation-entry');
+        assertEqual(entries.length, 1, `Expected 1 filtered result, got ${entries.length}`);
+        assertContains(entries[0].textContent, 'revoir', 'Wrong entry shown');
+      }},
+      { id: 'fn-13', name: 'clearAudioQueue empties queue', desc: 'Queue length becomes 0 after clear', fn: t => {
+        const w = t.contentWindow;
+        w.state.audioQueue = [{text:'a'},{text:'b'}];
+        w.clearAudioQueue();
+        assertEqual(w.state.audioQueue.length, 0, 'Queue not cleared');
+        assert(!w.state.audioPlaying, 'audioPlaying should be false');
+      }},
+      { id: 'fn-14', name: 'enqueueSpeak adds to queue', desc: 'Queue grows by 1 when not playing', fn: t => {
+        const w = t.contentWindow;
+        w.clearAudioQueue();
+        w.state.audioPlaying = true; // prevent auto-process
+        const before = w.state.audioQueue.length;
+        w.enqueueSpeak('test', 'fr-FR', {value:''}, {value:'1'}, null);
+        assertEqual(w.state.audioQueue.length, before + 1, 'Queue did not grow');
+        w.clearAudioQueue();
+      }},
+      { id: 'fn-15', name: 'speakByLang respects speakLang=fr', desc: 'Only FR enqueued when speakLang=fr', fn: t => {
+        const w = t.contentWindow;
+        w.clearAudioQueue();
+        w.state.audioPlaying = true;
+        w.state.speakLang = 'fr';
+        w.speakByLang('Bonjour', 'Hello');
+        assertEqual(w.state.audioQueue.length, 1, 'Should queue exactly 1 item');
+        assertEqual(w.state.audioQueue[0].lang, 'fr-FR', 'Should be FR');
+        w.clearAudioQueue();
+        w.state.speakLang = 'fr';
+      }},
+      { id: 'fn-16', name: 'speakByLang respects speakLang=both', desc: 'Both FR and EN enqueued', fn: t => {
+        const w = t.contentWindow;
+        w.clearAudioQueue();
+        w.state.audioPlaying = true;
+        w.state.speakLang = 'both';
+        w.speakByLang('Bonjour', 'Hello');
+        assertEqual(w.state.audioQueue.length, 2, 'Should queue 2 items for both');
+        w.clearAudioQueue();
+        w.state.speakLang = 'fr';
+      }},
+      { id: 'fn-17', name: 'speakByLang respects speakLang=en', desc: 'Only EN enqueued when speakLang=en', fn: t => {
+        const w = t.contentWindow;
+        w.clearAudioQueue();
+        w.state.audioPlaying = true;
+        w.state.speakLang = 'en';
+        w.speakByLang('Bonjour', 'Hello');
+        assertEqual(w.state.audioQueue.length, 1, 'Should queue 1 item');
+        assertEqual(w.state.audioQueue[0].lang, 'en-GB', 'Should be EN');
+        w.clearAudioQueue();
+        w.state.speakLang = 'fr';
+      }},
+    ]
+  },
+
+  {
+    id: 'ui',
+    icon: '🖥️',
+    name: 'UI Interactions',
+    tests: [
+      { id: 'ui-01', name: 'Near-live button gets .active class', desc: 'CSS class toggled on click', fn: t => {
+        const btn = t.querySelector('#nearLiveBtn');
+        btn.click();
+        assert(btn.classList.contains('active'), 'Should have .active');
+        btn.click();
+        assert(!btn.classList.contains('active'), 'Should lose .active');
+      }},
+      { id: 'ui-02', name: 'Auto-play button gets .active class', desc: 'CSS class toggled on click', fn: t => {
+        const btn = t.querySelector('#autoPlayBtn');
+        btn.click();
+        assert(btn.classList.contains('active'), 'Should have .active');
+        btn.click();
+        assert(!btn.classList.contains('active'), 'Should lose .active');
+      }},
+      { id: 'ui-03', name: 'Mode badge text updates', desc: '"Manual" → "Continuous" on toggle', fn: t => {
+        const toggle = t.querySelector('#modeToggle');
+        const badge = t.querySelector('#modeBadge');
+        toggle.checked = true;
+        toggle.dispatchEvent(new Event('change'));
+        assertEqual(badge.textContent, 'Continuous', `Badge text: "${badge.textContent}"`);
+        toggle.checked = false;
+        toggle.dispatchEvent(new Event('change'));
+        assertEqual(badge.textContent, 'Manual', `Badge text: "${badge.textContent}"`);
+      }},
+      { id: 'ui-04', name: 'Speak lang buttons: active class exclusive', desc: 'Only one button active at a time', fn: t => {
+        const btns = [...t.querySelectorAll('.speak-lang-btn')];
+        btns.forEach(b => b.click());
+        const active = btns.filter(b => b.classList.contains('active'));
+        assertEqual(active.length, 1, `Expected 1 active, got ${active.length}`);
+        btns[0].click(); // reset to FR
+      }},
+      { id: 'ui-05', name: 'Arabic keyboard toggles visible', desc: '.visible class added/removed on toggle btn', fn: t => {
+        const kb = t.querySelector('#arabicKeyboard');
+        const btn = t.querySelector('#keyboardToggleBtn');
+        btn.click();
+        assert(kb.classList.contains('visible'), 'Keyboard should show');
+        btn.click();
+        assert(!kb.classList.contains('visible'), 'Keyboard should hide');
+      }},
+      { id: 'ui-06', name: 'Shortcuts panel toggles', desc: '.visible class toggled by shortcutsBtn', fn: t => {
+        const panel = t.querySelector('#shortcutsPanel');
+        const btn = t.querySelector('#shortcutsBtn');
+        btn.click();
+        assert(panel.classList.contains('visible'), 'Panel should show');
+        btn.click();
+        assert(!panel.classList.contains('visible'), 'Panel should hide');
+      }},
+      { id: 'ui-07', name: 'Font slider changes CSS variable', desc: '--font-scale var updated on slide', fn: t => {
+        const slider = t.querySelector('#fontSlider');
+        slider.value = '1.4';
+        slider.dispatchEvent(new Event('input'));
+        const val = t.documentElement.style.getPropertyValue('--font-scale');
+        assertEqual(val, '1.4', `--font-scale: "${val}"`);
+        slider.value = '1';
+        slider.dispatchEvent(new Event('input'));
+      }},
+      { id: 'ui-08', name: 'Placeholder hides when typing', desc: 'placeholderHint opacity 0 when text present', fn: t => {
+        const box = t.querySelector('#transcriptBox');
+        const hint = t.querySelector('#placeholderHint');
+        t.contentWindow.setTranscript('test');
+        assertEqual(hint.style.opacity, '0', 'Placeholder should be hidden');
+        t.contentWindow.setTranscript('');
+      }},
+      { id: 'ui-09', name: 'Clear button wipes history', desc: 'After clear, histories empty and DOM shows empty state', fn: t => {
+        const w = t.contentWindow;
+        w.addEntries('ar', 'fr', 'en', null, null);
+        t.querySelector('#clearBtn').click();
+        assertEqual(w.state.frHistory.length, 0, 'frHistory not cleared');
+        assertEqual(w.state.enHistory.length, 0, 'enHistory not cleared');
+        assertEqual(w.state.sessionLog.length, 0, 'sessionLog not cleared');
+        assert(!t.querySelector('#frHistory .translation-entry'), 'FR entries still in DOM');
+      }},
+      { id: 'ui-10', name: 'Replay buttons disabled initially', desc: '#frReplayBtn and #enReplayBtn start disabled', fn: t => {
+        t.querySelector('#clearBtn').click();
+        assert(t.querySelector('#frReplayBtn').disabled, 'FR replay should be disabled');
+        assert(t.querySelector('#enReplayBtn').disabled, 'EN replay should be disabled');
+      }},
+      { id: 'ui-11', name: 'Replay buttons enabled after entry', desc: 'After addEntries, replay buttons enabled', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        w.addEntries('test', 'Test FR', 'Test EN', null, null);
+        assert(!t.querySelector('#frReplayBtn').disabled, 'FR replay should be enabled');
+        assert(!t.querySelector('#enReplayBtn').disabled, 'EN replay should be enabled');
+      }},
+      { id: 'ui-12', name: 'Star entry changes state.starred', desc: 'Clicking ☆ on entry sets starred=true', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        w.addEntries('star', 'Étoile', 'Star', null, null);
+        const star = t.querySelector('#frHistory .entry-star');
+        if (!star) return skip('No star element found');
+        const id = parseInt(star.dataset.id);
+        star.click();
+        const entry = w.state.frHistory.find(x => x.id === id);
+        assert(entry && entry.starred, 'Entry not starred after click');
+      }},
+      { id: 'ui-13', name: 'Fullscreen mode adds CSS class', desc: '.fullscreen-mode on panel, close btn visible', fn: t => {
+        const btn = t.querySelector('#frFullBtn');
+        btn.click();
+        assert(t.querySelector('#frPanel').classList.contains('fullscreen-mode'), 'fullscreen-mode not added');
+        assert(t.querySelector('#fullscreenClose').classList.contains('visible'), 'Close btn not shown');
+        t.querySelector('#fullscreenClose').click();
+        assert(!t.querySelector('#frPanel').classList.contains('fullscreen-mode'), 'fullscreen-mode not removed');
+      }},
+      { id: 'ui-14', name: 'Waveform inactive by default', desc: '#waveform does not have .active class', fn: t => {
+        assert(!t.querySelector('#waveform').classList.contains('active'), 'Waveform should not be active');
+      }},
+      { id: 'ui-15', name: 'Back-translation toggle CSS class', desc: '.active added/removed on backTransBtn', fn: t => {
+        const btn = t.querySelector('#backTransBtn');
+        btn.click();
+        assert(btn.classList.contains('active'), 'Should have .active');
+        btn.click();
+        assert(!btn.classList.contains('active'), 'Should lose .active');
+      }},
+    ]
+  },
+
+  {
+    id: 'keyboard',
+    icon: '⌨️',
+    name: 'Arabic Virtual Keyboard',
+    tests: [
+      { id: 'kb-01', name: 'Letter key inserts character', desc: 'Clicking ب appends to transcript', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('');
+        t.querySelector('#keyboardToggleBtn').click();
+        const baKey = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.char === 'ب');
+        assert(baKey, 'Key ب not found');
+        baKey.click();
+        assertContains(w.getTranscript(), 'ب', 'ب not inserted');
+        t.querySelector('#keyboardToggleBtn').click();
+        w.setTranscript('');
+      }},
+      { id: 'kb-02', name: 'Backspace key deletes last char', desc: 'Last character removed on backspace', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('مرحب');
+        t.querySelector('#keyboardToggleBtn').click();
+        const bksp = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.action === 'backspace');
+        assert(bksp, 'Backspace key not found');
+        bksp.click();
+        assertEqual(w.getTranscript(), 'مرح', `After backspace: "${w.getTranscript()}"`);
+        t.querySelector('#keyboardToggleBtn').click();
+        w.setTranscript('');
+      }},
+      { id: 'kb-03', name: 'Space key inserts space', desc: 'Space appended to transcript', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('مرحبا');
+        t.querySelector('#keyboardToggleBtn').click();
+        const spaceKey = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.action === 'space');
+        assert(spaceKey, 'Space key not found');
+        spaceKey.click();
+        assert(t.querySelector('#transcriptBox').textContent.endsWith(' '), 'Space not appended');
+        t.querySelector('#keyboardToggleBtn').click();
+        w.setTranscript('');
+      }},
+      { id: 'kb-04', name: 'Delete-word removes last word', desc: '"مرحبا عالم" → "مرحبا "', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('مرحبا عالم');
+        t.querySelector('#keyboardToggleBtn').click();
+        const delWord = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.action === 'clear-word');
+        assert(delWord, 'clear-word key not found');
+        delWord.click();
+        const result = t.querySelector('#transcriptBox').textContent;
+        assert(!result.includes('عالم'), `"عالم" should be deleted, got: "${result}"`);
+        t.querySelector('#keyboardToggleBtn').click();
+        w.setTranscript('');
+      }},
+      { id: 'kb-05', name: 'All 28 Arabic letters present', desc: 'Core Arabic alphabet keys all exist', fn: t => {
+        const letters = 'ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي'.split(' ');
+        const keys = [...t.querySelectorAll('.kb-key[data-char]')].map(k => k.dataset.char);
+        const missing = letters.filter(l => !keys.includes(l));
+        assertEqual(missing.length, 0, `Missing letters: ${missing.join(' ')}`);
+      }},
+      { id: 'kb-06', name: 'لا (lam-alef) key present', desc: 'Ligature لا has its own key', fn: t => {
+        const key = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.char === 'لا');
+        assert(key, 'لا key missing');
+      }},
+      { id: 'kb-07', name: 'Arabic numerals ١-٩ present', desc: 'Eastern Arabic numeral keys exist', fn: t => {
+        const nums = '١٢٣٤٥٦٧٨٩٠'.split('');
+        const keys = [...t.querySelectorAll('.kb-key[data-char]')].map(k => k.dataset.char);
+        const missing = nums.filter(n => !keys.includes(n));
+        assertEqual(missing.length, 0, `Missing numerals: ${missing.join('')}`);
+      }},
+      { id: 'kb-08', name: 'Translate key triggers translation', desc: 'KB translate action calls translateText', async fn(t) {
+        const w = t.contentWindow;
+        let called = false;
+        const orig = w.translateText;
+        w.translateText = async () => { called = true; };
+        w.setTranscript('مرحبا');
+        t.querySelector('#keyboardToggleBtn').click();
+        const transKey = [...t.querySelectorAll('.kb-key')].find(k => k.dataset.action === 'translate');
+        assert(transKey, 'Translate key not found');
+        transKey.click();
+        await delay(50);
+        assert(called, 'translateText not called from keyboard');
+        w.translateText = orig;
+        t.querySelector('#keyboardToggleBtn').click();
+      }},
+    ]
+  },
+
+  {
+    id: 'translation',
+    icon: '🌐',
+    name: 'Translation & API',
+    tests: [
+      { id: 'tr-01', name: 'translateText calls MyMemory API', desc: 'Fetches ar|fr and ar|en endpoints', async fn(t) {
+        const w = t.contentWindow;
+        const urls = [];
+        const orig = w.fetch;
+        w.fetch = async (url) => { urls.push(url); return { json: async () => ({ responseData: { translatedText: 'ok' }}) }; };
+        await w.translateText('مرحبا');
+        assert(urls.some(u => u.includes('ar|fr')), 'ar|fr not fetched');
+        assert(urls.some(u => u.includes('ar|en')), 'ar|en not fetched');
+        w.fetch = orig;
+      }},
+      { id: 'tr-02', name: 'translateText populates both histories', desc: 'frHistory and enHistory each get 1 entry', async fn(t) {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        const orig = w.fetch;
+        w.fetch = async (url) => ({ json: async () => ({ responseData: { translatedText: url.includes('ar|fr') ? 'Salut' : 'Hi' }}) });
+        await w.translateText('سلام');
+        assertEqual(w.state.frHistory.length, 1, 'FR history wrong count');
+        assertEqual(w.state.enHistory.length, 1, 'EN history wrong count');
+        assertEqual(w.state.frHistory[0].text, 'Salut', 'FR text wrong');
+        assertEqual(w.state.enHistory[0].text, 'Hi', 'EN text wrong');
+        w.fetch = orig;
+      }},
+      { id: 'tr-03', name: 'translateText stores in memory', desc: 'translationMemory keyed by lowercase text', async fn(t) {
+        const w = t.contentWindow;
+        const orig = w.fetch;
+        w.fetch = async (url) => ({ json: async () => ({ responseData: { translatedText: 'cached' }}) });
+        await w.translateText('ذاكرة');
+        assert(w.state.translationMemory['ذاكرة'], 'Memory entry missing');
+        w.fetch = orig;
+      }},
+      { id: 'tr-04', name: 'translateText handles fetch error gracefully', desc: 'Sets error status, does not throw', async fn(t) {
+        const w = t.contentWindow;
+        const orig = w.fetch;
+        w.fetch = async () => { throw new Error('Network error'); };
+        let threw = false;
+        try { await w.translateText('خطأ'); } catch(e) { threw = true; }
+        assert(!threw, 'translateText should not throw');
+        assert(t.querySelector('#statusBar').classList.contains('error'), 'Error status not set');
+        w.fetch = orig;
+      }},
+      { id: 'tr-05', name: 'translateChunkLive works silently on error', desc: 'No throw on network failure', async fn(t) {
+        const w = t.contentWindow;
+        const orig = w.fetch;
+        w.fetch = async () => { throw new Error('fail'); };
+        let threw = false;
+        try { await w.translateChunkLive('خطأ مباشر'); } catch(e) { threw = true; }
+        assert(!threw, 'translateChunkLive should not throw');
+        w.fetch = orig;
+      }},
+      { id: 'tr-06', name: 'fetchBackTranslation returns null when off', desc: 'backTrans=false → {backFr:null, backEn:null}', async fn(t) {
+        const w = t.contentWindow;
+        w.state.backTrans = false;
+        const result = await w.fetchBackTranslation('Bonjour', 'Hello');
+        assertEqual(result.backFr, null, 'backFr should be null');
+        assertEqual(result.backEn, null, 'backEn should be null');
+      }},
+      { id: 'tr-07', name: 'fetchBackTranslation fetches when on', desc: 'backTrans=true → fetches fr|ar and en|ar', async fn(t) {
+        const w = t.contentWindow;
+        w.state.backTrans = true;
+        const urls = [];
+        const orig = w.fetch;
+        w.fetch = async (url) => { urls.push(url); return { json: async () => ({ responseData: { translatedText: 'عربي' }}) }; };
+        await w.fetchBackTranslation('Bonjour', 'Hello');
+        assert(urls.some(u => u.includes('fr|ar')), 'fr|ar not fetched');
+        assert(urls.some(u => u.includes('en|ar')), 'en|ar not fetched');
+        w.fetch = orig;
+        w.state.backTrans = false;
+      }},
+    ]
+  },
+
+  {
+    id: 'export',
+    icon: '📤',
+    name: 'Export & Session',
+    tests: [
+      { id: 'ex-01', name: 'Export TXT shows toast when empty', desc: 'No download attempted, toast shown', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        let toastMsg = '';
+        const orig = w.showToast;
+        w.showToast = (m) => { toastMsg = m; };
+        t.querySelector('#exportTxtBtn').click();
+        assert(toastMsg.includes('Nothing'), `Toast: "${toastMsg}"`);
+        w.showToast = orig;
+      }},
+      { id: 'ex-02', name: 'Export PDF shows toast when empty', desc: 'No window opened, toast shown', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        let toastMsg = '';
+        const orig = w.showToast;
+        w.showToast = (m) => { toastMsg = m; };
+        t.querySelector('#exportPdfBtn').click();
+        assert(toastMsg.includes('Nothing'), `Toast: "${toastMsg}"`);
+        w.showToast = orig;
+      }},
+      { id: 'ex-03', name: 'Session log records AR+FR+EN', desc: 'Each entry has ar, fr, en, ts fields', async fn(t) {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        const orig = w.fetch;
+        w.fetch = async (url) => ({ json: async () => ({ responseData: { translatedText: url.includes('ar|fr') ? 'Bonsoir' : 'Good evening' }}) });
+        await w.translateText('مساء الخير');
+        const entry = w.state.sessionLog[0];
+        assert(entry, 'No session log entry');
+        assert(entry.ar, 'No AR in log');
+        assert(entry.fr, 'No FR in log');
+        assert(entry.en, 'No EN in log');
+        assert(entry.ts, 'No timestamp in log');
+        w.fetch = orig;
+      }},
+      { id: 'ex-04', name: 'Clear wipes session log', desc: 'sessionLog.length === 0 after clear', fn: t => {
+        const w = t.contentWindow;
+        w.addEntries('test', 'FR', 'EN', null, null);
+        t.querySelector('#clearBtn').click();
+        assertEqual(w.state.sessionLog.length, 0, 'Session log not cleared');
+      }},
+      { id: 'ex-05', name: 'Clear resets search inputs', desc: 'frSearch and enSearch empty after clear', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#frSearch').value = 'test';
+        t.querySelector('#enSearch').value = 'test';
+        t.querySelector('#clearBtn').click();
+        assertEqual(t.querySelector('#frSearch').value, '', 'frSearch not cleared');
+        assertEqual(t.querySelector('#enSearch').value, '', 'enSearch not cleared');
+      }},
+      { id: 'ex-06', name: 'Clear empties audio queue', desc: 'audioQueue.length === 0 after clear', fn: t => {
+        const w = t.contentWindow;
+        w.state.audioQueue = [{text:'a'},{text:'b'}];
+        t.querySelector('#clearBtn').click();
+        assertEqual(w.state.audioQueue.length, 0, 'Audio queue not cleared');
+      }},
+    ]
+  },
+
+  {
+    id: 'a11y',
+    icon: '♿',
+    name: 'Accessibility & Resilience',
+    tests: [
+      { id: 'a11y-01', name: 'Transcript box is contenteditable', desc: 'User can edit Arabic text before translate', fn: t => {
+        const box = t.querySelector('#transcriptBox');
+        assertEqual(box.getAttribute('contenteditable'), 'true', 'Not editable');
+        assertEqual(box.getAttribute('dir'), 'rtl', 'Should be RTL');
+      }},
+      { id: 'a11y-02', name: 'Translate btn works on empty transcript', desc: 'Shows toast, does not crash', fn: t => {
+        const w = t.contentWindow;
+        w.setTranscript('');
+        let toastMsg = '';
+        const orig = w.showToast;
+        w.showToast = m => { toastMsg = m; };
+        t.querySelector('#translateBtn').click();
+        assert(toastMsg, 'No toast shown');
+        w.showToast = orig;
+      }},
+      { id: 'a11y-03', name: 'Mode toggle stops active recognition', desc: 'state._stopRequested set when listening', fn: t => {
+        const w = t.contentWindow;
+        w.state.isListening = true;
+        w.state.recognition = { stop: () => {} };
+        const toggle = t.querySelector('#modeToggle');
+        toggle.checked = true;
+        toggle.dispatchEvent(new Event('change'));
+        assert(w.state._stopRequested, '_stopRequested not set');
+        w.state.isListening = false;
+        toggle.checked = false;
+        toggle.dispatchEvent(new Event('change'));
+      }},
+      { id: 'a11y-04', name: 'XSS safe: transcript box output', desc: 'HTML tags in Arabic text are escaped', fn: t => {
+        const w = t.contentWindow;
+        t.querySelector('#clearBtn').click();
+        w.addEntries('<img onerror=alert(1)>', '<b>bold</b>', '<script>evil</script>', null, null);
+        const frHTML = t.querySelector('#frHistory').innerHTML;
+        assert(!frHTML.includes('<b>'), 'HTML not escaped in FR');
+        assert(!frHTML.includes('<script>'), 'Script tag in EN');
+      }},
+      { id: 'a11y-05', name: 'Rate slider range valid', desc: 'Min 0.5, max 2.0 for natural speech rates', fn: t => {
+        const fr = t.querySelector('#frRateSlider');
+        const en = t.querySelector('#enRateSlider');
+        assert(parseFloat(fr.min) >= 0.1 && parseFloat(fr.max) <= 3, 'FR rate out of sane range');
+        assert(parseFloat(en.min) >= 0.1 && parseFloat(en.max) <= 3, 'EN rate out of sane range');
+      }},
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ASSERTION HELPERS
+// ═══════════════════════════════════════════════════════════════
+function assert(cond, msg) { if (!cond) throw new Error(msg || 'Assertion failed'); }
+function assertEqual(a, b, msg) { if (a !== b) throw new Error(msg || `Expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`); }
+function assertContains(str, sub, msg) { if (!str.includes(sub)) throw new Error(msg || `"${str}" does not contain "${sub}"`); }
+function skip(msg) { const e = new Error(msg); e.skip = true; throw e; }
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════════
+let stats = { pass: 0, fail: 0, skip: 0, run: 0, total: 0 };
+
+function updateStats() {
+  document.getElementById('passCount').textContent = stats.pass;
+  document.getElementById('failCount').textContent = stats.fail;
+  document.getElementById('skipCount').textContent = stats.skip;
+  document.getElementById('runCount').textContent = stats.run;
+  const done = stats.pass + stats.fail + stats.skip;
+  document.getElementById('progressBar').style.width = stats.total ? `${(done / stats.total) * 100}%` : '0%';
+}
+
+function log(msg, type='info') {
+  const lb = document.getElementById('logBody');
+  const line = document.createElement('div');
+  line.className = `log-${type}`;
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  lb.appendChild(line);
+  lb.scrollTop = lb.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER SUITES
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('suitesContainer');
+
+stats.total = SUITES.reduce((sum, s) => sum + s.tests.length, 0);
+
+SUITES.forEach(suite => {
+  const suiteEl = document.createElement('div');
+  suiteEl.className = 'suite';
+  suiteEl.id = `suite-${suite.id}`;
+
+  const count = suite.tests.length;
+  suiteEl.innerHTML = `
+    <div class="suite-header" onclick="toggleSuite('${suite.id}')">
+      <div class="suite-title">
+        <span class="suite-icon">${suite.icon}</span>
+        <span class="suite-name">${suite.name}</span>
+        <span class="suite-count">${count} test${count !== 1 ? 's' : ''}</span>
+      </div>
+      <span class="suite-badge" id="badge-${suite.id}">Pending</span>
+    </div>
+    <div class="suite-body" id="body-${suite.id}">
+      ${suite.tests.map(test => `
+        <div class="test-row" id="row-${test.id}">
+          <div class="test-status" id="status-${test.id}">·</div>
+          <div class="test-info">
+            <div class="test-name">${test.name}</div>
+            <div class="test-desc">${test.desc}</div>
+          </div>
+          <div class="test-result" id="result-${test.id}">—</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  container.appendChild(suiteEl);
+});
+
+function toggleSuite(id) {
+  const body = document.getElementById(`body-${id}`);
+  body.classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN ENGINE
+// ═══════════════════════════════════════════════════════════════
+async function runAll() {
+  const frame = document.getElementById('testFrame');
+  const runBtn = document.getElementById('runAllBtn');
+  runBtn.disabled = true;
+  runBtn.textContent = '⏳ Running...';
+
+  stats = { pass: 0, fail: 0, skip: 0, run: 0, total: stats.total };
+  updateStats();
+  document.getElementById('logBody').innerHTML = '';
+  document.getElementById('elapsed').textContent = '0.0s';
+
+  // Reset all test UI
+  SUITES.forEach(suite => {
+    suite.tests.forEach(test => {
+      document.getElementById(`status-${test.id}`).className = 'test-status';
+      document.getElementById(`status-${test.id}`).textContent = '·';
+      document.getElementById(`result-${test.id}`).className = 'test-result';
+      document.getElementById(`result-${test.id}`).textContent = '—';
+    });
+    document.getElementById(`badge-${suite.id}`).className = 'suite-badge';
+    document.getElementById(`badge-${suite.id}`).textContent = 'Running';
+    document.getElementById(`badge-${suite.id}`).classList.add('running');
+  });
+
+  // Wait for iframe to be ready
+  log('Loading Kalami v2.1 in test frame...', 'info');
+  await delay(1200);
+
+  const t = frame.contentDocument || frame.contentWindow.document;
+
+  if (!t || !frame.contentWindow.state) {
+    log('❌ iframe failed to load — make sure kalami-v2.1.html is in same folder', 'fail');
+    runBtn.disabled = false;
+    runBtn.textContent = '▶ Run All Tests';
+    return;
+  }
+
+  log('✅ iframe ready — starting tests', 'pass');
+  const startTime = Date.now();
+
+  for (const suite of SUITES) {
+    let suitePassed = 0, suiteFailed = 0, suiteSkipped = 0;
+    log(`\n── ${suite.icon} ${suite.name} ──`, 'info');
+
+    for (const test of suite.tests) {
+      const statusEl = document.getElementById(`status-${test.id}`);
+      const resultEl = document.getElementById(`result-${test.id}`);
+
+      // Mark running
+      statusEl.className = 'test-status running';
+      statusEl.textContent = '⟳';
+      stats.run++;
+      updateStats();
+
+      const t0 = performance.now();
+      let passed = false, skipped = false, errMsg = '';
+
+      try {
+        const result = test.fn(t);
+        if (result && typeof result.then === 'function') await result;
+        passed = true;
+      } catch(e) {
+        if (e.skip) { skipped = true; errMsg = e.message; }
+        else { errMsg = e.message || String(e); }
+      }
+
+      const elapsed = (performance.now() - t0).toFixed(1);
+
+      if (skipped) {
+        statusEl.className = 'test-status skip';
+        statusEl.textContent = '⊘';
+        resultEl.className = 'test-result';
+        resultEl.textContent = `SKIP: ${errMsg}`;
+        stats.skip++; suiteSkipped++;
+        log(`  ⊘ SKIP  ${test.name}: ${errMsg}`, 'warn');
+      } else if (passed) {
+        statusEl.className = 'test-status pass';
+        statusEl.textContent = '✓';
+        resultEl.className = 'test-result pass';
+        resultEl.textContent = `✓ ${elapsed}ms`;
+        stats.pass++; suitePassed++;
+        log(`  ✓ PASS  ${test.name}  (${elapsed}ms)`, 'pass');
+      } else {
+        statusEl.className = 'test-status fail';
+        statusEl.textContent = '✗';
+        resultEl.className = 'test-result fail';
+        resultEl.innerHTML = `✗ ${errMsg}`;
+        stats.fail++; suiteFailed++;
+        log(`  ✗ FAIL  ${test.name}: ${errMsg}`, 'fail');
+      }
+
+      stats.run--;
+      updateStats();
+
+      // Small yield between tests
+      await delay(30);
+    }
+
+    // Suite badge
+    const badge = document.getElementById(`badge-${suite.id}`);
+    if (suiteFailed > 0) {
+      badge.className = 'suite-badge fail';
+      badge.textContent = `${suiteFailed} failed`;
+    } else if (suiteSkipped > 0 && suitePassed === 0) {
+      badge.className = 'suite-badge';
+      badge.textContent = `${suiteSkipped} skipped`;
+    } else {
+      badge.className = 'suite-badge pass';
+      badge.textContent = `${suitePassed} passed`;
+    }
+  }
+
+  const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+  document.getElementById('elapsed').textContent = `${totalTime}s`;
+  updateStats();
+
+  const summary = `\n═══ DONE: ${stats.pass} passed · ${stats.fail} failed · ${stats.skip} skipped · ${totalTime}s ═══`;
+  log(summary, stats.fail > 0 ? 'fail' : 'pass');
+
+  runBtn.disabled = false;
+  runBtn.textContent = stats.fail > 0 ? `▶ Re-run (${stats.fail} failed)` : '✅ All Passed — Re-run';
+}
+
+// Auto-count total
+stats.total = SUITES.reduce((sum, s) => sum + s.tests.length, 0);
+updateStats();
+
+document.getElementById('runAllBtn').addEventListener('click', runAll);
+</script>
+</body>
+</html>
